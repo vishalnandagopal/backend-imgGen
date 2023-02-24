@@ -21,14 +21,14 @@ import static org.junit.Assert.assertEquals;
 public class CheckHTTPResponse {
 
     @LocalServerPort
-    private int port = 4500;
+    private int port = 8080;
 
     @Autowired
-    private TestRestTemplate testRestTemplate;
+    private TestRestTemplate testRestTemplate = new TestRestTemplate();
 
     @Test
     public  void shouldPassIfStringMatches() throws Exception {
-        assertEquals("I have no idea what I'm doing.",
+        assertEquals("D:\\BMC_Internship\\Coding\\ImagGenBackend\\src\\main\\resources\\static\\sample_image.png",
                 testRestTemplate.getForObject("http://localhost:" + port + "/",
                         String.class));
     }
