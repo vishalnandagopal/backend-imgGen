@@ -19,7 +19,7 @@ public class DallEClient {
     }
 
     public static String getOpenAIAPIKey(String keyName) {
-        Dotenv dotenv = Dotenv.configure().filename("bmc.env").load();
+        Dotenv dotenv = Dotenv.configure().filename("./../bmc.env").load();
         return dotenv.get(keyName);
     }
 }
