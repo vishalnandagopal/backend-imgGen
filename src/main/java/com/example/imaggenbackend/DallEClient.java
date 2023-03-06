@@ -15,7 +15,7 @@ public class DallEClient {
     // private static ImageEditor imgEditor;
     private String OPENAI_API_KEY;
 
-    public DallEClient() throws MalformedURLException {
+    public DallEClient() throws IOException {
 
         this.OPENAI_API_KEY = getOpenAIAPIKey();
         imgGenerator = new ImageGenerator(this.OPENAI_API_KEY);
@@ -44,8 +44,21 @@ public class DallEClient {
         return url;
     }
 
-    private static String getOpenAIAPIKey() {
-        Dotenv dotenv = Dotenv.configure().filename("./../bmc.env").load();
+    private static String getOpenAIAPIKey() throws IOException {
+        Dotenv dotenv;
+        String filename = "";
+
+        if (Miscellaneous.checkIfExistsInDirectory(Miscellaneous.pathify("./", "bmc.env"), false)) {
+            filename = "./bmc.env";
+        } else if (Miscellaneous.checkIfExistsInDirectory(Miscellaneous.pathify("./../", "bmc.env"), false)) {
+            filename = "./../bmc.env";
+        }
+
+        if (filename.length() > 0) {
+            dotenv = Dotenv.configure().ignoreIfMissing().filename(filename).load();
+        } else {
+            dotenv = Dotenv.configure().ignoreIfMissing().load();
+        }
         return dotenv.get("OPENAI_API_KEY");
     }
 }
@@ -64,7 +77,8 @@ class ImageGenerator {
         // String prompt;
         // int noOfImages = 1;
         // String imgSize = "1024x1024";
-        String requestBody = String.format("{ \"prompt\": \"%s\", \"n\": %d, \"size\": \"%s\" }", prompt, noOfImages,
+        String requestBody = String.format("{ \"prompt\": \"%s\", \"n\": %d, \"size\": \"%s\" }", prompt,
+                noOfImages,
                 imgSize);
         String response = httpCaller.newRequest(requestBody);
         return response;
@@ -80,4 +94,5 @@ class ImageEditor {
     public ImageEditor(String apiKey) throws MalformedURLException {
         httpCaller = new HTTPCaller(API_URL, "POST", apiKey, "application/json");
     }
+
 }
