@@ -1,5 +1,4 @@
 package com.example.imaggenbackend;
-
 import java.io.IOException;
 import java.util.Map;
 
@@ -21,7 +20,7 @@ public class imgGenRestAPI {
     }
 
     @RestController
-    public class IndexController {
+    public static class IndexController {
         @RequestMapping("/")
         public String index() {
             return "Welcome to the backend for Vishal and Bimal's imagGen";
@@ -29,7 +28,7 @@ public class imgGenRestAPI {
     }
 
     @RestController
-    public class postHelloController {
+    public static class postHelloController {
         static DallEClient dallEClient;
 
         public postHelloController() throws IOException {
