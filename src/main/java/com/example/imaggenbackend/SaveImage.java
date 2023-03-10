@@ -15,7 +15,7 @@ public class SaveImage {
         System.out.println("Saved image to ");
     }
 
-    public static void main(String args[]) throws IOException {
+    public static void main(String[] args) throws IOException {
         SaveImage.save("https://idjh.files.wordpress.com/2011/12/google-ics.jpg");
     }
     

@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -12,24 +11,36 @@ import io.github.cdimascio.dotenv.Dotenv;
 
 public class DallEClient {
     private static ImageGenerator imgGenerator;
-    // private static ImageEditor imgEditor;
-    private String OPENAI_API_KEY;
 
     public DallEClient() throws IOException {
 
-        this.OPENAI_API_KEY = getOpenAIAPIKey();
-        imgGenerator = new ImageGenerator(this.OPENAI_API_KEY);
+        // private static ImageEditor imgEditor;
+        String OPENAI_API_KEY = getOpenAIAPIKey();
+        imgGenerator = new ImageGenerator(OPENAI_API_KEY);
         // imgEditor = new ImageEditor(this.OPENAI_API_KEY);
+    }
+
+    public String promptBuilder(String prompt, String exclude, String include, String backgroundColor) {
+        String mainPrompt = prompt + " .";
+        if (exclude.length() > 0) {
+            mainPrompt += "Exclude " + exclude + " .";
+        }
+        if (include.length() > 0) {
+            mainPrompt += "Include " + include + " .";
+        }
+        if (backgroundColor.length() > 0) {
+            mainPrompt += "The backgroundColor of the image must be " + backgroundColor + " .";
+        }
+        return mainPrompt;
     }
 
     public static String genImage(String prompt, int noOfImages, String imgSize) throws IOException {
         String response = imgGenerator.callAPI(prompt, noOfImages, imgSize);
-        String generated_image_url = getURLFromResponseDict(response);
-        return generated_image_url;
+        return getURLFromResponseDict(response);
     }
 
     private static String getURLFromResponseDict(String responseBody)
-            throws JsonMappingException, JsonProcessingException {
+            throws JsonProcessingException {
         // Create an ObjectMapper instance
         ObjectMapper objectMapper = new ObjectMapper();
 
@@ -38,10 +49,9 @@ public class DallEClient {
 
         // Extract the URL attribute as a string
         JsonNode data_first_child = rootNode.get("data").get(0);
-        String url = data_first_child.get("url").asText();
 
         // Return the URL
-        return url;
+        return data_first_child.get("url").asText();
     }
 
     private static String getOpenAIAPIKey() throws IOException {
@@ -74,14 +84,13 @@ class ImageGenerator {
 
     public String callAPI(String prompt, int noOfImages, String imgSize)
             throws IOException {
-        // String prompt;
-        // int noOfImages = 1;
-        // String imgSize = "1024x1024";
+        /* String prompt;
+        int noOfImages = 1;
+        String imgSize = "1024x1024";*/
         String requestBody = String.format("{ \"prompt\": \"%s\", \"n\": %d, \"size\": \"%s\" }", prompt,
                 noOfImages,
                 imgSize);
-        String response = httpCaller.newRequest(requestBody);
-        return response;
+        return httpCaller.newRequest(requestBody);
     }
 }
 
@@ -95,4 +104,32 @@ class ImageEditor {
         httpCaller = new HTTPCaller(API_URL, "POST", apiKey, "application/json");
     }
 
+}
+
+class ChatGPT {
+
+    HTTPCaller httpCaller;
+
+    final static String API_URL = "https://api.openai.com/v1/chat/completions";
+
+    ChatGPT(String apiKey) throws MalformedURLException {
+        this.httpCaller = new HTTPCaller(API_URL, "POST", apiKey, "application/json");
+    }
+
+    public String callAPI(String role, String content)
+            throws IOException {
+        // String role
+        // String content
+        String model = "gpt-3.5-turbo";
+        String requestBody = String.format("{" +
+                        "\"model\": \"%s\"," +
+                        "\"messages\": [" +
+                        "{" +
+                        "\"role\": \"%s\"," +
+                        "\"content\": \"%s!\"" +
+                        "}" +
+                        "]}",
+                model, role, content);
+        return httpCaller.newRequest(requestBody);
+    }
 }

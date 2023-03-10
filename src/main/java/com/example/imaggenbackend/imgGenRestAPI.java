@@ -45,10 +45,20 @@ public class imgGenRestAPI {
                 throws IOException {
             int noOfImages = Integer.parseInt(payload.get("no"));
             String prompt = payload.get("prompt");
+            // String exclude = payload.get("exclude")
+            // String include = payload.get("include")
+            // String backgroundColor = payload.get("backgroundColor")
+            // String mainPrompt = DallEClient.promptBuilder(prompt, exclude, include, backgroundColor);
             String imgSize = payload.get("size");
+
             String imgSrc = DallEClient.genImage(prompt, noOfImages, imgSize);
+            
+            // String imgSrc = DallEClient.genImage(mainPrompt, noOfImages, imgSize);
+
             // String imgSrc = "https://www.simplilearn.com/ice9/free_resources_article_thumb/what_is_image_Processing.jpg";
+            
             System.out.printf("%d - %s - %s %s\n", noOfImages, imgSrc, imgSize, prompt);
+            
             return imgSrc;
         }
     }

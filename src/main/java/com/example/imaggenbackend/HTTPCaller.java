@@ -12,7 +12,7 @@ public class HTTPCaller {
 
     URL URLToCall;
     String requestMethod;
-    String APIKey = "";
+    String APIKey;
     String contentType;
 
     public HTTPCaller(String URLString, String requestMethod, String APIKey, String contentType)
@@ -54,8 +54,7 @@ public class HTTPCaller {
         }
 
         int responseCode = httpConn.getResponseCode();
-        InputStream responseStream = responseCode == 200 ? httpConn.getInputStream() : httpConn.getErrorStream();
-        return responseStream;
+        return responseCode == 200 ? httpConn.getInputStream() : httpConn.getErrorStream();
     }
     public static InputStream fetch(String URLString, String requestMethod, String requestBody, String APIKey,
             String contentType) throws IOException {
@@ -73,7 +72,6 @@ public class HTTPCaller {
         InputStream responseStream = this.fetch(requestBody);
         try (Scanner s = new Scanner(responseStream).useDelimiter("\\A")) {
             response = s.hasNext() ? s.next() : "";
-            s.close();
         }
         System.out.println(response);
         return response;
