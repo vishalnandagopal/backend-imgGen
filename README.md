@@ -24,7 +24,9 @@ This project uses Maven as it's build tool. It was tested using Adoptium Termuri
 
 Open the [imgGenRestAPI.java](./src/main/java/com/example/imaggenbackend/imgGenRestAPI.java) file in any IDE like or IntelliJ Ideai or VSCode (with the [Extension Pack for Java](https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-pack) installed). It has a `main` function which you can run.
 
-The imgGenRestAPI.java file is the only file you should run (even if other files have a `main` function).
+1. In the backend-ImagGen folder, run `mvnw spring-boot:run`
+
+The imgGenRestAPI.java file has the `main` function.
 
 ## Files and their functions
 

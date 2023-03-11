@@ -26,7 +26,6 @@ public class Miscellaneous {
         }
         return false;
     }
-
     public static boolean saveToFile(InputStream rawBytes, Path path, boolean overwrite) throws IOException {
         // Use the Files.copy() method to copy the input stream to the target file
         if (checkIfExistsInDirectory(path, true)) {
