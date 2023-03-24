@@ -11,12 +11,14 @@ import io.github.cdimascio.dotenv.Dotenv;
 
 public class DallEClient {
     private static ImageGenerator imgGenerator;
+    private static ChatGPT chatGenerator;
 
     public DallEClient() throws IOException {
 
         // private static ImageEditor imgEditor;
         String OPENAI_API_KEY = getOpenAIAPIKey();
         imgGenerator = new ImageGenerator(OPENAI_API_KEY);
+        chatGenerator = new ChatGPT(OPENAI_API_KEY);
         // imgEditor = new ImageEditor(this.OPENAI_API_KEY);
     }
 
@@ -36,10 +38,15 @@ public class DallEClient {
 
     public static String genImage(String prompt, int noOfImages, String imgSize) throws IOException {
         String response = imgGenerator.callAPI(prompt, noOfImages, imgSize);
-        return getURLFromResponseDict(response);
+        return getURLFromResponseDict(response, true);
     }
 
-    private static String getURLFromResponseDict(String responseBody)
+    public static String genChat(String prompt, String role)throws IOException{
+        String response = chatGenerator.callAPI(prompt, role);
+        return getURLFromResponseDict(response, false);
+    }
+
+    private static String getURLFromResponseDict(String responseBody, boolean dalleresponse)
             throws JsonProcessingException {
         // Create an ObjectMapper instance
         ObjectMapper objectMapper = new ObjectMapper();
@@ -47,11 +54,24 @@ public class DallEClient {
         // Parse the response string into a JsonNode object
         JsonNode rootNode = objectMapper.readTree(responseBody);
 
-        // Extract the URL attribute as a string
-        JsonNode data_first_child = rootNode.get("data").get(0);
+        if (dalleresponse){
+            // DallE response
 
-        // Return the URL
-        return data_first_child.get("url").asText();
+            // Extract the prompt response attribute as a string
+            JsonNode data_first_child = rootNode.get("data").get(0);
+
+            // Return the URL
+            return data_first_child.get("url").asText();
+        }
+        else{
+            // Chatgpt response
+
+            JsonNode choices_first_child = rootNode.get("choices").get(0);
+
+            // Return the response content
+            return choices_first_child.get("message").get("content").asText();
+        }
+
     }
 
     private static String getOpenAIAPIKey() throws IOException {
@@ -115,8 +135,7 @@ class ChatGPT {
     ChatGPT(String apiKey) throws MalformedURLException {
         this.httpCaller = new HTTPCaller(API_URL, "POST", apiKey, "application/json");
     }
-
-    public String callAPI(String role, String content)
+    public String callAPI(String content, String role)
             throws IOException {
         // String role
         // String content
@@ -132,4 +151,7 @@ class ChatGPT {
                 model, role, content);
         return httpCaller.newRequest(requestBody);
     }
+    // public String callApi(String content)  throws IOException{
+    //     return callApi("user", content);
+    // }
 }
