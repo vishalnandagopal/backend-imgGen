@@ -9,20 +9,20 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.github.cdimascio.dotenv.Dotenv;
 
-public class DallEClient {
-    private static ImageGenerator imgGenerator;
+public class OpenAIClient {
+    private static DallE imgGenerator;
     private static ChatGPT chatGenerator;
 
-    public DallEClient() throws IOException {
+    public OpenAIClient() throws IOException {
 
         // private static ImageEditor imgEditor;
         String OPENAI_API_KEY = getOpenAIAPIKey();
-        imgGenerator = new ImageGenerator(OPENAI_API_KEY);
+        imgGenerator = new DallE(OPENAI_API_KEY);
         chatGenerator = new ChatGPT(OPENAI_API_KEY);
         // imgEditor = new ImageEditor(this.OPENAI_API_KEY);
     }
 
-    public String promptBuilder(String prompt, String exclude, String include, String backgroundColor) {
+    public String imgPromptBuilder(String prompt, String exclude, String include, String backgroundColor) {
         String mainPrompt = prompt + " .";
         if (exclude.length() > 0) {
             mainPrompt += "Exclude " + exclude + " .";
@@ -37,7 +37,7 @@ public class DallEClient {
     }
 
     public static String genImage(String prompt, int noOfImages, String imgSize) throws IOException {
-        String response = imgGenerator.callAPI(prompt, noOfImages, imgSize);
+        String response = imgGenerator.generateImage(prompt, noOfImages, imgSize);
         return getURLFromResponseDict(response, true);
     }
 
@@ -46,7 +46,7 @@ public class DallEClient {
         return getURLFromResponseDict(response, false);
     }
 
-    private static String getURLFromResponseDict(String responseBody, boolean dalleresponse)
+    private static String getURLFromResponseDict(String responseBody, boolean dallEResponse)
             throws JsonProcessingException {
         // Create an ObjectMapper instance
         ObjectMapper objectMapper = new ObjectMapper();
@@ -54,7 +54,7 @@ public class DallEClient {
         // Parse the response string into a JsonNode object
         JsonNode rootNode = objectMapper.readTree(responseBody);
 
-        if (dalleresponse){
+        if (dallEResponse){
             // DallE response
 
             // Extract the prompt response attribute as a string
@@ -78,9 +78,9 @@ public class DallEClient {
         Dotenv dotenv;
         String filename = "";
 
-        if (Miscellaneous.checkIfExistsInDirectory(Miscellaneous.pathify("./", "bmc.env"), false)) {
+        if (Miscellaneous.checkIfExistsInDirectory(Miscellaneous.generatePath("./", "bmc.env"), false)) {
             filename = "./bmc.env";
-        } else if (Miscellaneous.checkIfExistsInDirectory(Miscellaneous.pathify("./../", "bmc.env"), false)) {
+        } else if (Miscellaneous.checkIfExistsInDirectory(Miscellaneous.generatePath("./../", "bmc.env"), false)) {
             filename = "./../bmc.env";
         }
 
@@ -93,16 +93,19 @@ public class DallEClient {
     }
 }
 
-class ImageGenerator {
-    HTTPCaller httpCaller;
+class DallE {
+    HTTPCaller imageGenerator;
+    HTTPCaller imageEditor;
+    final static String GEN_IMAGE_API_URL = "https://api.openai.com/v1/images/generations";
+    final static String EDIT_IMAGE_API_URL = "https://api.openai.com/v1/images/edits";
 
-    final static String API_URL = "https://api.openai.com/v1/images/generations";
+    public DallE(String apiKey) throws MalformedURLException {
+        this.imageGenerator = new HTTPCaller(GEN_IMAGE_API_URL, "POST", apiKey, "application/json");
+        this.imageEditor = new HTTPCaller(EDIT_IMAGE_API_URL, "POST", apiKey, "application/json");
 
-    public ImageGenerator(String apiKey) throws MalformedURLException {
-        this.httpCaller = new HTTPCaller(API_URL, "POST", apiKey, "application/json");
     }
 
-    public String callAPI(String prompt, int noOfImages, String imgSize)
+    public String generateImage(String prompt, int noOfImages, String imgSize)
             throws IOException {
         /* String prompt;
         int noOfImages = 1;
@@ -110,22 +113,13 @@ class ImageGenerator {
         String requestBody = String.format("{ \"prompt\": \"%s\", \"n\": %d, \"size\": \"%s\" }", prompt,
                 noOfImages,
                 imgSize);
-        return httpCaller.newRequest(requestBody);
-    }
-}
-
-class ImageEditor {
-
-    static HTTPCaller httpCaller;
-
-    final static String API_URL = "https://api.openai.com/v1/images/edits";
-
-    public ImageEditor(String apiKey) throws MalformedURLException {
-        httpCaller = new HTTPCaller(API_URL, "POST", apiKey, "application/json");
+        return imageGenerator.newRequest(requestBody);
     }
 
+    public String editImage(String apiKey) throws MalformedURLException {
+        return "temp";
+    }
 }
-
 class ChatGPT {
 
     HTTPCaller httpCaller;

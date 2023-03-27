@@ -7,7 +7,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class Miscellaneous {
-    public static Path pathify(String filename, String directory) {
+    public static Path generatePath(String filename, String directory) {
         return Paths.get(directory, filename);
     }
 
@@ -26,7 +26,7 @@ public class Miscellaneous {
         }
         return false;
     }
-    public static boolean saveToFile(InputStream rawBytes, Path path, boolean overwrite) throws IOException {
+    public static boolean saveToFile(InputStream rawBytes, Path path) throws IOException {
         // Use the Files.copy() method to copy the input stream to the target file
         if (checkIfExistsInDirectory(path, true)) {
             Files.copy(rawBytes, path);
@@ -35,5 +35,14 @@ public class Miscellaneous {
         } else {
             return false;
         }
+    }
+
+    public static void saveImage(String remoteImgURL) throws IOException {
+
+        try (InputStream rawBytesOfImage = HTTPCaller.fetch(remoteImgURL, "", "", "", "")) {
+
+        } // Close the input stream
+
+        System.out.println("Saved image to ");
     }
 }

@@ -25,10 +25,10 @@ public class imgGenRestAPI {
 
     @RestController
     public static class postHelloController {
-        static DallEClient dallEClient;
+        static OpenAIClient openAIClient;
 
         public postHelloController() throws IOException {
-            dallEClient = new DallEClient();
+            openAIClient = new OpenAIClient();
         }
 
         @CrossOrigin(origins = "http://localhost:4200")
@@ -47,7 +47,7 @@ public class imgGenRestAPI {
             // String mainPrompt = DallEClient.promptBuilder(prompt, exclude, include, backgroundColor);
             String imgSize = payload.get("size");
 
-            String imgSrc = DallEClient.genImage(prompt, noOfImages, imgSize);
+            String imgSrc = OpenAIClient.genImage(prompt, noOfImages, imgSize);
             
             // String imgSrc = DallEClient.genImage(mainPrompt, noOfImages, imgSize);
 
@@ -68,15 +68,11 @@ public class imgGenRestAPI {
             String prompt = payload.get("prompt");
             String role = payload.get("role");
 
-            String imgSrc = DallEClient.genImage(prompt, noOfImages, imgSize);
+            String chatResponse = OpenAIClient.genChat(prompt, role);
 
-            // String imgSrc = DallEClient.genImage(mainPrompt, noOfImages, imgSize);
+            System.out.printf("%s - %s - %s\n", prompt, chatResponse, role);
 
-            // String imgSrc = "https://www.simplilearn.com/ice9/free_resources_article_thumb/what_is_image_Processing.jpg";
-
-            System.out.printf("%d - %s - %s %s\n", noOfImages, imgSrc, imgSize, prompt);
-
-            return imgSrc;
+            return chatResponse;
         }
     }
 }
