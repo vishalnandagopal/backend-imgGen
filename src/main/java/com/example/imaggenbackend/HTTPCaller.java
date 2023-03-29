@@ -8,23 +8,22 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Scanner;
 
-public class HTTPCaller {   
+public class HTTPCaller {
 
     URL URLToCall;
     String requestMethod;
     String APIKey;
     String contentType;
 
-    public HTTPCaller(String URLString, String requestMethod, String APIKey, String contentType)
-            throws MalformedURLException {
+    public HTTPCaller(String URLString, String requestMethod, String APIKey, String contentType) throws MalformedURLException {
 
         this.URLToCall = new URL(URLString);
         this.requestMethod = requestMethod; // GET, POST, PUT, etc
         this.APIKey = APIKey; // Key if any
         this.contentType = contentType;
     }
-    public static InputStream fetch(URL URLToCall, String requestMethod, String requestBody, String APIKey,
-                                    String contentType) throws IOException {
+
+    public static InputStream fetch(URL URLToCall, String requestMethod, String requestBody, String APIKey, String contentType) throws IOException {
         HttpURLConnection httpConn = (HttpURLConnection) URLToCall.openConnection();
 
         // httpConn.setRequestMethod("POST");
@@ -56,10 +55,10 @@ public class HTTPCaller {
         int responseCode = httpConn.getResponseCode();
         return responseCode == 200 ? httpConn.getInputStream() : httpConn.getErrorStream();
     }
-    public static InputStream fetch(String URLString, String requestMethod, String requestBody, String APIKey,
-            String contentType) throws IOException {
+
+    public static InputStream fetch(String URLString, String requestMethod, String requestBody, String APIKey, String contentType) throws IOException {
         URL URLToCall = new URL(URLString);
-        return fetch(URLToCall,requestMethod, requestBody, APIKey, contentType);
+        return fetch(URLToCall, requestMethod, requestBody, APIKey, contentType);
     }
 
     public InputStream fetch(String requestBody) throws IOException {

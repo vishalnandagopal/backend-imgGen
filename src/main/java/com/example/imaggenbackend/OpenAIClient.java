@@ -1,13 +1,12 @@
 package com.example.imaggenbackend;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import io.github.cdimascio.dotenv.Dotenv;
+
+import java.io.IOException;
+import java.net.MalformedURLException;
 
 public class OpenAIClient {
     private static DallE imgGenerator;
@@ -22,26 +21,12 @@ public class OpenAIClient {
         // imgEditor = new ImageEditor(this.OPENAI_API_KEY);
     }
 
-    public String imgPromptBuilder(String prompt, String exclude, String include, String backgroundColor) {
-        String mainPrompt = prompt + " .";
-        if (exclude.length() > 0) {
-            mainPrompt += "Exclude " + exclude + " .";
-        }
-        if (include.length() > 0) {
-            mainPrompt += "Include " + include + " .";
-        }
-        if (backgroundColor.length() > 0) {
-            mainPrompt += "The backgroundColor of the image must be " + backgroundColor + " .";
-        }
-        return mainPrompt;
-    }
-
     public static String genImage(String prompt, int noOfImages, String imgSize) throws IOException {
         String response = imgGenerator.generateImage(prompt, noOfImages, imgSize);
         return getURLFromResponseDict(response, true);
     }
 
-    public static String genChat(String prompt, String role)throws IOException{
+    public static String genChat(String prompt, String role) throws IOException {
         String response = chatGenerator.callAPI(prompt, role);
         return getURLFromResponseDict(response, false);
     }
@@ -54,7 +39,7 @@ public class OpenAIClient {
         // Parse the response string into a JsonNode object
         JsonNode rootNode = objectMapper.readTree(responseBody);
 
-        if (dallEResponse){
+        if (dallEResponse) {
             // DallE response
 
             // Extract the prompt response attribute as a string
@@ -62,8 +47,7 @@ public class OpenAIClient {
 
             // Return the URL
             return data_first_child.get("url").asText();
-        }
-        else{
+        } else {
             // Chatgpt response
 
             JsonNode choices_first_child = rootNode.get("choices").get(0);
@@ -94,15 +78,29 @@ public class OpenAIClient {
 }
 
 class DallE {
-    HTTPCaller imageGenerator;
-    HTTPCaller imageEditor;
     final static String GEN_IMAGE_API_URL = "https://api.openai.com/v1/images/generations";
     final static String EDIT_IMAGE_API_URL = "https://api.openai.com/v1/images/edits";
+    HTTPCaller imageGenerator;
+    HTTPCaller imageEditor;
 
     public DallE(String apiKey) throws MalformedURLException {
         this.imageGenerator = new HTTPCaller(GEN_IMAGE_API_URL, "POST", apiKey, "application/json");
         this.imageEditor = new HTTPCaller(EDIT_IMAGE_API_URL, "POST", apiKey, "application/json");
 
+    }
+
+    public static String imgPromptBuilder(String prompt, String exclude, String include, String backgroundColor) {
+        String mainPrompt = prompt + " .";
+        if (exclude.length() > 0) {
+            mainPrompt += "Exclude " + exclude + " .";
+        }
+        if (include.length() > 0) {
+            mainPrompt += "Include " + include + " .";
+        }
+        if (backgroundColor.length() > 0) {
+            mainPrompt += "The backgroundColor of the image must be " + backgroundColor + " .";
+        }
+        return mainPrompt;
     }
 
     public String generateImage(String prompt, int noOfImages, String imgSize)
@@ -120,15 +118,16 @@ class DallE {
         return "temp";
     }
 }
+
 class ChatGPT {
 
-    HTTPCaller httpCaller;
-
     final static String API_URL = "https://api.openai.com/v1/chat/completions";
+    HTTPCaller httpCaller;
 
     ChatGPT(String apiKey) throws MalformedURLException {
         this.httpCaller = new HTTPCaller(API_URL, "POST", apiKey, "application/json");
     }
+
     public String callAPI(String content, String role)
             throws IOException {
         // String role

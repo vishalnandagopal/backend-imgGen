@@ -15,8 +15,7 @@ public class Miscellaneous {
         return Files.deleteIfExists(path);
     }
 
-    public static boolean checkIfExistsInDirectory(Path path, boolean create_if_doesnt_exist)
-            throws IOException {
+    public static boolean checkIfExistsInDirectory(Path path, boolean create_if_doesnt_exist) throws IOException {
         if (Files.exists(path)) {
             return true;
         } else if (create_if_doesnt_exist) {
@@ -26,6 +25,7 @@ public class Miscellaneous {
         }
         return false;
     }
+
     public static boolean saveToFile(InputStream rawBytes, Path path) throws IOException {
         // Use the Files.copy() method to copy the input stream to the target file
         if (checkIfExistsInDirectory(path, true)) {
