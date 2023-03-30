@@ -61,7 +61,12 @@ public class imgGenRestAPI {
         // @RequestParam(name = "prompt", required = true) String prompt,
             throws IOException {
         String prompt = payload.get("prompt");
+
+        prompt = "I am trying to generate a prompt for image generation using DALLE-2. I will provide the context for it. Help me generate a suitable prompt that can be fed to DALLE-2 to generate a clear, appealing image without any distortions or blur. The context is: " + prompt;
+        prompt = prompt + "Generate an effective prompt for it. Prompt: ";
+
         String role = payload.get("role");
+
         String chatResponse = OpenAIClient.genChat(prompt, role);
         System.out.printf("%s - %s - %s\n", prompt, chatResponse, role);
 
