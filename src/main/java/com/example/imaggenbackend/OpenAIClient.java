@@ -90,15 +90,15 @@ class DallE {
     }
 
     public static String imgPromptBuilder(String prompt, String exclude, String include, String backgroundColor) {
-        String mainPrompt = prompt + " .";
-        if (exclude.length() > 0) {
-            mainPrompt += "Exclude " + exclude + " .";
+        String mainPrompt = prompt + ".";
+        if (exclude.length() > 2) {
+            mainPrompt += "Exclude any " + exclude + " from the image.";
         }
-        if (include.length() > 0) {
-            mainPrompt += "Include " + include + " .";
+        if (include.length() > 2) {
+            mainPrompt += "Include " + include + " in the image.";
         }
-        if (backgroundColor.length() > 0) {
-            mainPrompt += "The backgroundColor of the image must be " + backgroundColor + " .";
+        if (backgroundColor.length() > 2) {
+            mainPrompt += "The background of the image must be " + backgroundColor + ".";
         }
         return mainPrompt;
     }
