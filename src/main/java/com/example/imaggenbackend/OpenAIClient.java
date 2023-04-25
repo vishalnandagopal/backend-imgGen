@@ -22,8 +22,16 @@ public class OpenAIClient {
     }
 
     public static String genImage(String prompt, int noOfImages, String imgSize) throws IOException {
+
         String response = imgGenerator.generateImage(prompt, noOfImages, imgSize);
-        return getURLFromResponseDict(response, true);
+
+        System.out.println("Response from Dalle is: \n" + response);
+        String response_new = getURLFromResponseDict(response, true);
+
+//        System.out.println("Response sent to UI is: \n" + response_new);
+//        return response_new;
+
+        return response;
     }
 
     public static String genChat(String prompt, String role) throws IOException {
