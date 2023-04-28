@@ -67,20 +67,9 @@ public class OpenAIClient {
     }
 
     private static String getOpenAIAPIKey() throws IOException {
-        Dotenv dotenv;
         String filename = "";
 
-        if (Miscellaneous.checkIfExistsInDirectory(Miscellaneous.generatePath("./", "bmc.env"), false)) {
-            filename = "./bmc.env";
-        } else if (Miscellaneous.checkIfExistsInDirectory(Miscellaneous.generatePath("./../", "bmc.env"), false)) {
-            filename = "./../bmc.env";
-        }
-
-        if (filename.length() > 0) {
-            dotenv = Dotenv.configure().ignoreIfMissing().filename(filename).load();
-        } else {
-            dotenv = Dotenv.configure().ignoreIfMissing().load();
-        }
+        Dotenv dotenv = SaveImage.getDotenv(filename);
         return dotenv.get("OPENAI_API_KEY");
     }
 }
