@@ -5,9 +5,7 @@ import jakarta.persistence.*;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.*;
@@ -100,6 +98,7 @@ public class SaveImage {
         String envFileName = "";
         String databaseUrl = "";
         String uname = "";
+
         String pwd = "";
 
 
@@ -130,12 +129,13 @@ public class SaveImage {
         try {
             conn = DriverManager.getConnection(databaseUrl, uname, pwd);
             stmt = conn.createStatement();
-            rs = stmt.executeQuery("SELECT * FROM images");
 
-            while (rs.next()) {
-                System.out.println("File name: " + rs.getString("name"));
-            }
-            System.out.println("Query Completed.");
+//            rs = stmt.executeQuery("SELECT * FROM images");
+//
+//            while (rs.next()) {
+//                System.out.println("File name: " + rs.getString("name"));
+//            }
+//            System.out.println("Query Completed.");
 
             updateQuery = "INSERT INTO images VALUES (?, ?, ?)";
 
@@ -150,7 +150,15 @@ public class SaveImage {
             prepStmt.setString(2, filename);
             prepStmt.setBlob(3, blob);
 
+            /**
+             * Save to database.
+             */
             prepStmt.executeUpdate();
+
+            /**
+             * Save Locally to filesystem.
+             */
+            saveBlobLocally(blob, "D:\\BMC_Internship\\Coding\\ImagGenBackend\\artifacts\\export", UUID);
 
             System.out.println("File Stored Successfully");
             return true;
@@ -158,7 +166,6 @@ public class SaveImage {
             e.printStackTrace();
             return false;
         }
-
 
     }
 
@@ -179,6 +186,24 @@ public class SaveImage {
         return dotenv;
     }
 
+    private static void saveBlobLocally(Blob blob, String filelocation, String UUID) throws SQLException, IOException {
+
+        String filename = filelocation + File.separator + UUID;
+        File file = new File(filename);
+        if (file.exists()) {
+            file.delete();
+        }
+        FileOutputStream fos = new FileOutputStream(file);
+        InputStream is = blob.getBinaryStream();
+        byte[] buffer = new byte[1024];
+        int length;
+        while ((length = is.read(buffer)) != -1) {
+            fos.write(buffer, 0, length);
+        }
+        fos.close();
+        is.close();
+    }
+
 
     /**
      * Define the API that will accept image details from the user and store it in database.
@@ -195,9 +220,23 @@ public class SaveImage {
         String name = formData.get("name");
         URL url;
 
+        /**
+         * Just a temporary way to instruct zip creation until buildPage API is created.
+         * Later this will be replaced by input from buildPage API.
+         */
+        if(name.equals("create")){
+            try{
+                pageExportBuilder.prepareFiles();
+            }
+            catch (IOException e){
+                System.out.println("Zip Prepare Failed");
+                e.printStackTrace();
+            }
+        }
+
 
         /**
-         * Try to build an URL object from the received URL.
+         * Try to build a URL object from the received URL.
          * If invalid, Notify the user, and stop the further execution of the code.
          */
 
