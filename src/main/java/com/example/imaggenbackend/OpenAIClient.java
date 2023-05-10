@@ -3,75 +3,97 @@ package com.example.imaggenbackend;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.github.cdimascio.dotenv.Dotenv;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.util.ArrayList;
+
 
 public class OpenAIClient {
-    private static DallE imgGenerator;
-    private static ChatGPT chatGenerator;
+    private final DallE imgGenerator;
+    private final ChatGPT chatGenerator;
 
     public OpenAIClient() throws IOException {
 
-        // private static ImageEditor imgEditor;
         String OPENAI_API_KEY = getOpenAIAPIKey();
         imgGenerator = new DallE(OPENAI_API_KEY);
         chatGenerator = new ChatGPT(OPENAI_API_KEY);
         // imgEditor = new ImageEditor(this.OPENAI_API_KEY);
     }
 
-    public static String genImage(String prompt, int noOfImages, String imgSize) throws IOException {
-
-        String response = imgGenerator.generateImage(prompt, noOfImages, imgSize);
-
-        System.out.println("Response from Dalle is: \n" + response);
-        String response_new = getURLFromResponseDict(response, true);
-
-//        System.out.println("Response sent to UI is: \n" + response_new);
-//        return response_new;
-
-        return response;
-    }
-
-    public static String genChat(String prompt, String role) throws IOException {
-        String response = chatGenerator.callAPI(prompt, role);
-        return getURLFromResponseDict(response, false);
-    }
-
-    private static String getURLFromResponseDict(String responseBody, boolean dallEResponse)
+    private static String extractAnswerFromChatGPTResponse(String responseBody)
             throws JsonProcessingException {
+
+        System.out.println(responseBody);
+
         // Create an ObjectMapper instance
         ObjectMapper objectMapper = new ObjectMapper();
 
         // Parse the response string into a JsonNode object
         JsonNode rootNode = objectMapper.readTree(responseBody);
 
-        if (dallEResponse) {
-            // DallE response
+        // We are handling a response from ChatGPT. We need to extract the reply as a text.
 
-            // Extract the prompt response attribute as a string
-            JsonNode data_first_child = rootNode.get("data").get(0);
+        JsonNode choices_first_child = rootNode.get("choices").get(0);
 
-            // Return the URL
-            return data_first_child.get("url").asText();
-        } else {
-            // Chatgpt response
+        // Return the response content
+        return choices_first_child.get("message").get("content").asText();
+    }
 
-            JsonNode choices_first_child = rootNode.get("choices").get(0);
+    private static ArrayList<String> extractImgSRCsFromDallEResponse(String responseBody)
+            throws JsonProcessingException {
 
-            // Return the response content
-            return choices_first_child.get("message").get("content").asText();
+        System.out.println(responseBody);
+
+        // Create an ObjectMapper instance
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        // Parse the response string into a JsonNode object
+        JsonNode rootNode = objectMapper.readTree(responseBody);
+
+        // We are handling a response from Dall-E. We need to extract the image SRCs from the response
+        ArrayList<String> imgSRCs = new ArrayList<>();
+
+
+        int noOfImages = rootNode.get("data").size();
+
+        for (int i = 0; i < noOfImages; i++) {
+            imgSRCs.add(rootNode.get("data").get(i).get("url").asText());
         }
 
+        // Return the URLs
+        return imgSRCs;
     }
 
     private static String getOpenAIAPIKey() throws IOException {
-        String filename = "";
-
-        Dotenv dotenv = SaveImage.getDotenv(filename);
-        return dotenv.get("OPENAI_API_KEY");
+        return Miscellaneous.readDotenv("bmc.env", "OPENAI_API_KEY", true);
     }
+
+    public pageExportBuilder.imageRequestResponse genImage(String prompt, int noOfImages, String imgSize) throws IOException {
+        String response = imgGenerator.generateImage(prompt, noOfImages, imgSize);
+        System.out.println("Response from Dall-E is: \n" + response);
+        ArrayList<String> imgSRCs = extractImgSRCsFromDallEResponse(response);
+
+        int zipID = Miscellaneous.generateRandomZipID();
+
+        for (String imageURL : imgSRCs) {
+            pageExportBuilder.downloadImage(imageURL, zipID);
+        }
+        System.out.println(pageExportBuilder.getZipPath(String.valueOf(zipID)));
+
+        // {
+        //            "zipID":zipID,
+        // "data":"url1, url2"
+        // }
+        return new pageExportBuilder.imageRequestResponse(zipID, imgSRCs);
+    }
+
+    public String genChat(String prompt, String role) throws IOException {
+        String response = chatGenerator.callAPI(prompt, role);
+        return extractAnswerFromChatGPTResponse(response);
+    }
+
+
 }
 
 class DallE {
@@ -88,31 +110,33 @@ class DallE {
 
     public static String imgPromptBuilder(String prompt, String exclude, String include, String backgroundColor) {
         String mainPrompt = prompt + ".";
-        if (exclude.length() > 2) {
-            mainPrompt += "Exclude any " + exclude + " from the image.";
+        if (exclude != null) {
+            if (exclude.length() > 2) {
+                mainPrompt += "Exclude any " + exclude + " from the image.";
+            }
         }
-        if (include.length() > 2) {
-            mainPrompt += "Include " + include + " in the image.";
+        if (include != null) {
+            if (include.length() > 2) {
+                mainPrompt += "Include " + include + " in the image.";
+            }
         }
-        if (backgroundColor.length() > 2) {
-            mainPrompt += "The background of the image must be " + backgroundColor + ".";
+        if (backgroundColor != null) {
+            if (backgroundColor.length() > 2) {
+                mainPrompt += "The background of the image must be " + backgroundColor + ".";
+            }
         }
         return mainPrompt;
     }
 
     public String generateImage(String prompt, int noOfImages, String imgSize)
             throws IOException {
-        /* String prompt;
+         /*String prompt;
         int noOfImages = 1;
-        String imgSize = "1024x1024";*/
+        String imgSize = "1024x1024"; */
         String requestBody = String.format("{ \"prompt\": \"%s\", \"n\": %d, \"size\": \"%s\" }", prompt,
                 noOfImages,
                 imgSize);
         return imageGenerator.newRequest(requestBody);
-    }
-
-    public String editImage(String apiKey) throws MalformedURLException {
-        return "temp";
     }
 }
 
@@ -129,7 +153,21 @@ class ChatGPT {
             throws IOException {
         // String role
         // String content
+
+        ArrayList<String> validRoles = new ArrayList<>() {
+            {
+                add("system");
+                add("assistant");
+                add("user");
+            }
+        };
+
+        if (!validRoles.contains(role)) {
+            role = "user";
+        }
+
         String model = "gpt-3.5-turbo";
+
         String requestBody = String.format("{" +
                         "\"model\": \"%s\"," +
                         "\"messages\": [" +
@@ -139,9 +177,7 @@ class ChatGPT {
                         "}" +
                         "]}",
                 model, role, content);
+
         return httpCaller.newRequest(requestBody);
     }
-    // public String callApi(String content)  throws IOException{
-    //     return callApi("user", content);
-    // }
 }
