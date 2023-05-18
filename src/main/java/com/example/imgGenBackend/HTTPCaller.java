@@ -1,4 +1,4 @@
-package com.example.imaggenbackend;
+package com.example.imgGenBackend;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -72,7 +72,7 @@ public class HTTPCaller {
         try (Scanner s = new Scanner(responseStream).useDelimiter("\\A")) {
             response = s.hasNext() ? s.next() : "";
         }
-        System.out.println(response);
+        // System.out.println(response);
         return response;
     }
 

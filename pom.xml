@@ -10,10 +10,10 @@
         <relativePath/>
     </parent>
     <groupId>com.example</groupId>
-    <artifactId>ImagGenBackend</artifactId>
+    <artifactId>ImgGenBackend</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>ImagGenBackend</name>
-    <description>ImagGenBackend</description>
+    <name>ImgGenBackend</name>
+    <description>Backend for imgGen</description>
     <properties>
         <java.version>17</java.version>
     </properties>
