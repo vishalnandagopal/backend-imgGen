@@ -11,12 +11,12 @@ between the angular frontend and OpenAI servers.
 
 ## Environmental keys (Important)
 
-- Put your OpenAI key in a file named `bmc.env` in the same folder as this README. The structure of the `bmc.env` file
-  is :-
-  ```
-  OPENAI_API_KEY=xxxxx
-  ```
-- The backend will not be able to communicate with the OpenAI servers without the API key.
+-   Put your OpenAI key in a file named `bmc.env` in the same folder as this README. The structure of the `bmc.env` file
+    is :-
+    ```
+    OPENAI_API_KEY=xxxxx
+    ```
+-   The backend will not be able to communicate with the OpenAI servers without the API key.
 
 ## Running the file
 
