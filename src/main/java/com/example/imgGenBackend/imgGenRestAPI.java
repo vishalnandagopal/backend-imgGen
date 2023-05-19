@@ -69,18 +69,16 @@ public class imgGenRestAPI {
 
     @PostMapping(value = "/image", produces = "application/json")
     public ArrayList<PageExportBuilder.Image> image(@RequestBody Map<String, String> payload) throws IOException {
-        int noOfImages = 1;
+        int noOfImages;
         String prompt, exclude, include, imgSize, backgroundColor;
 
         try {
             noOfImages = Integer.parseInt(payload.get("no"));
             if (noOfImages > 4) {
-                throw new IllegalArgumentException("Max only 4 images are permitted. Will be set to 4");
+                throw new IllegalArgumentException("Only 1 image is permitted per API call right now. Will be set to 1");
             }
-        } catch (NumberFormatException e) {
-            noOfImages = 1;
         } catch (IllegalArgumentException e) {
-            noOfImages = 4;
+            noOfImages = 1;
         }
 
         prompt = payload.get("prompt");
@@ -89,7 +87,6 @@ public class imgGenRestAPI {
         backgroundColor = payload.get("backgroundColor");
 
         String preparedPrompt = DallEClient.promptBuilderForDallE(prompt, exclude, include, backgroundColor);
-
 
         imgSize = "1024x1024";
         /* img size code, excluded this field from the form.
@@ -115,7 +112,7 @@ public class imgGenRestAPI {
 
 
     @PostMapping(value = "/getzipID", produces = "application/json")
-    public String getZipID(@RequestBody Map<String, List<String>> payload) throws IOException {
+    public String getzipID(@RequestBody Map<String, List<String>> payload) throws IOException {
         ArrayList<String> imageIDs = new ArrayList<>() {
             {
                 addAll(payload.get("imageIDs"));
@@ -128,14 +125,11 @@ public class imgGenRestAPI {
             throw new IllegalArgumentException(String.format("4 IDs must be provided to the request. Only %d were provided", imageIDs.size()));
         }
 
-
-        String zipID = PageExportBuilder.generateZipFile(imageIDs,pageDescription);
-
-        return zipID;
+        return PageExportBuilder.generateZipFile(imageIDs, pageDescription);
     }
 
 
-    // Previous route was to /getzip/{zipID}. But it always saved the file as zipID instead of zipID.zip even if explicitely mentioning in the response headers. So the route was changed to /getzip/{zipID}.zip.
+    // Previous route was to /getzip/{zipID}. But it always saved the file as zipID instead of zipID.zip even if explicitly mentioning in the response headers. So the route was changed to /getzip/{zipID}.zip.
     @GetMapping(value = "/getzip/{zipID}.zip")
     public ResponseEntity<byte[]> getzip(@PathVariable String zipID, HttpServletResponse
             response) throws IOException {

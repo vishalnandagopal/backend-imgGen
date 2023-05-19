@@ -17,7 +17,7 @@ import java.util.Scanner;
 public class HTTPCaller {
 
     /**
-     * The URL to call every time when making a API call.
+     * The URL to call every time when making an API call.
      */
     URL URLToCall;
     /**
@@ -29,17 +29,18 @@ public class HTTPCaller {
      */
     String APIKey;
     /**
-     * The content-type of the API call. Set to "application/json" by defauly.
+     * The content-type of the API call. Set to "application/json" by default.
      */
     String contentType;
 
     /**
      * The constructor for the {@link HTTPCaller} class.
-     * @param URLString
-     * @param requestMethod
-     * @param APIKey
-     * @param contentType
-     * @throws MalformedURLException
+     *
+     * @param URLString     The URL to issue requests to
+     * @param requestMethod The HTTP method to use - GET or POST. GET by default.
+     * @param APIKey        The API key to use in the Authorization header, if any. None by default.
+     * @param contentType   The content type of the request. "application/json" by default.
+     * @throws MalformedURLException If the URL is not of the right format, an error is thrown by the URL object constructor
      */
     public HTTPCaller(String URLString, String requestMethod, String APIKey, String contentType) throws MalformedURLException {
 
@@ -68,7 +69,7 @@ public class HTTPCaller {
         }
 
         if (APIKey.length() > 0) {
-            // httpConn.setRequestProperty("Authorization", "Bearer " + "xxxxx");
+            // httpConn.setRequestProperty("Authorization", "Bearer " + "xxxxxxx");
             httpConn.setRequestProperty("Authorization", "Bearer " + APIKey);
         }
 
@@ -99,5 +100,4 @@ public class HTTPCaller {
         // System.out.println(response);
         return response;
     }
-
 }

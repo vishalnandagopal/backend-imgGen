@@ -29,7 +29,7 @@ public class PageExportBuilder {
      * @param exportID - The DWP page export ID
      * @return A string that can be written to a {@code data.json} file as it is
      */
-    public static String getPageExportDataJson(ArrayList<String> imageIDs, String exportID, String pageDescription  ) {
+    public static String getPageExportDataJson(ArrayList<String> imageIDs, String exportID, String pageDescription) {
 
         return "[ {" +
                 "  \"operation\" : \"CREATE\",\n" +
@@ -374,16 +374,14 @@ public class PageExportBuilder {
      *
      * @param imageIDs
      * @return The ZipID
-     * @throws IOException
+     * @throws IOException If I/O error occurs
      */
     public static String generateZipFile(ArrayList<String> imageIDs, String pageDescription) throws IOException {
 
         String zipID = Miscellaneous.generateRandomZipID();
         String exportID = Miscellaneous.generateRandomPageExportID();
 
-
         String zipFilePath = ZIP_FOLDER_PATH + zipID + ".zip";
-
 
         if (imageIDs.size() != 4) {
             throw new IllegalArgumentException(String.format("The current template only supports generating exports when you give 4 image IDs. you have request an export for %d image(s).", imageIDs.size()));
@@ -426,7 +424,6 @@ public class PageExportBuilder {
             filesToAddToZip.add(new File(IMG_FOLDER_PATH + imgID));
         }
 
-
         for (File file : filesToAddToZip) {
             if (file.isFile()) {
                 ZipEntry zipEntry = new ZipEntry(file.getName());
@@ -444,7 +441,6 @@ public class PageExportBuilder {
         }
         zos.close();
         return zipID;
-
     }
 
     /**
@@ -473,7 +469,7 @@ public class PageExportBuilder {
          * Constructor for Image class. Automatically downloads the image using the {@link #downloadImage()} method.
          *
          * @param url The url of the image, as sent in the response by Dall-E.
-         * @throws IOException
+         * @throws IOException If I/O error occurs
          */
         public Image(String url) throws IOException {
             this.url = url;
@@ -512,6 +508,9 @@ public class PageExportBuilder {
             System.out.println("Downloaded " + url + "-" + uuid);
         }
 
+        /**
+         * @throws IOException If I/O error occurs
+         */
         public void downloadImage() throws IOException {
             Image.downloadImage(this.url, this.id);
         }
