@@ -10,13 +10,14 @@ import java.util.ArrayList;
 
 /**
  * A container class for working with ChatGPT and Dall-E, and allows you to call both APIs with different parameters, while using the same API key.
+ * @author Vishal N (vishalnandagopal.com)
  */
 public class OpenAIClient {
     private final DallEClient dallEClient;
     private final ChatGPTClient chatGPTClient;
 
     /**
-     * Constructor for the {@link OpenAIClient} class. Fetches the API key using {@link #getOpenAIAPIKey()}, and sets new {@link DallEClient} and {@link ChatGPTClient} as private fields using the API key.
+     * Constructor for the {@link com.example.imgGenBackend.OpenAIClient OpenAIClient} class. Fetches the API key using {@link #getOpenAIAPIKey() getOpenAIAPIKey} method, and sets new {@link DallEClient} and {@link ChatGPTClient} as private members using the API key.
      *
      * @throws IOException
      */
@@ -150,8 +151,6 @@ public class OpenAIClient {
         String response = chatGPTClient.callChatGPTAPI(messageContents, roles);
         return extractAnswerFromChatGPTResponse(response);
     }
-
-
 }
 
 /**
@@ -162,7 +161,7 @@ class DallEClient {
     /**
      * The URL of the API to be used for communicating with Dall-E.
      */
-    final static String GEN_IMAGE_API_URL = "https://api.openai.com/v1/images/generations";
+    final static String IMAGE_GEN_API_URL = "https://api.openai.com/v1/images/generations";
     HTTPCaller httpCaller;
 
     /**
@@ -172,7 +171,7 @@ class DallEClient {
      * @throws MalformedURLException
      */
     public DallEClient(String apiKey) throws MalformedURLException {
-        this.httpCaller = new HTTPCaller(GEN_IMAGE_API_URL, "POST", apiKey, "application/json");
+        this.httpCaller = new HTTPCaller(IMAGE_GEN_API_URL, "POST", apiKey, "application/json");
     }
 
     public static String promptBuilderForDallE(String prompt, String exclude, String include, String backgroundColor) {
@@ -217,12 +216,12 @@ class ChatGPTClient {
     /**
      * The URL of the API to be used for communicating with Dall-E.
      */
-    final static String API_URL = "https://api.openai.com/v1/chat/completions";
+    final static String CHAT_GPT_API_URL = "https://api.openai.com/v1/chat/completions";
 
     /**
      * The model that must be used to generate ChatGPT's reply.
      */
-    final static String model = "gpt-3.5-turbo";
+    final static String CHATGPT_MODEL = "gpt-3.5-turbo";
 
     HTTPCaller httpCaller;
 
@@ -233,11 +232,12 @@ class ChatGPTClient {
      * @throws MalformedURLException
      */
     ChatGPTClient(String apiKey) throws MalformedURLException {
-        this.httpCaller = new HTTPCaller(API_URL, "POST", apiKey, "application/json");
+        this.httpCaller = new HTTPCaller(CHAT_GPT_API_URL, "POST", apiKey, "application/json");
     }
 
     /**
      * Call the ChatGPT API using the private field {@link #httpCaller} by passing the message contents and their respective roles.
+     *
      * @param messageContents String[] of the messages that should be passed to ChatGPT
      * @param roles
      * @return
@@ -271,7 +271,7 @@ class ChatGPTClient {
             }
         }
 
-        String requestBody = String.format("{ \"model\": \"%s\", \"messages\": [%s]}", model, messages);
+        String requestBody = String.format("{ \"model\": \"%s\", \"messages\": [%s]}", CHATGPT_MODEL, messages);
 
         String responseBody = httpCaller.newRequest(requestBody);
         System.out.println("Response from ChatGPT is: \n" + responseBody);

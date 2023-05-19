@@ -1,10 +1,3 @@
-/**
- * A REST API built using Spring, which serves as the backend for the angular frontend application. It exposes a way to call OpenAI APIs in a specific way and configuration.
- *
- * @author Vishal N
- * @version 1.0
- * @since 2023-01-09
- */
 package com.example.imgGenBackend;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -24,6 +17,15 @@ import java.util.Map;
 import java.util.Objects;
 
 
+/**
+ * A REST API built using Spring, which serves as the backend for the angular frontend application. It exposes a way to call OpenAI APIs in a specific way and configuration.
+ *
+ * @author Vishal N (vishalnandagopal.com)
+ * @version 1.0
+ * @since 2023-01-09
+ */
+
+@CrossOrigin(origins = {"http://localhost:4200", "http://127.0.0.1:4200"})
 @SpringBootApplication
 @RestController
 public class imgGenRestAPI {
@@ -43,7 +45,6 @@ public class imgGenRestAPI {
         return "Welcome to the backend for Vishal and Bimal's imagGen application. For more details, contact vishaln@bmc.com";
     }
 
-    @CrossOrigin(origins = "http://127.0.0.1:4200")
     @PostMapping(value = "/image_prompt")
     public String image_prompt(@RequestBody Map<String, String> payload) throws IOException {
 
@@ -54,7 +55,6 @@ public class imgGenRestAPI {
         return chatResponse;
     }
 
-    @CrossOrigin(origins = "http://127.0.0.1:4200")
     @PostMapping("/chat_prompt")
     public String chat_prompt(@RequestBody Map<String, String> payload) throws IOException {
 
@@ -67,7 +67,6 @@ public class imgGenRestAPI {
     }
 
 
-    @CrossOrigin(origins = "http://127.0.0.1:4200")
     @PostMapping(value = "/image", produces = "application/json")
     public ArrayList<PageExportBuilder.Image> image(@RequestBody Map<String, String> payload) throws IOException {
         int noOfImages = 1;
@@ -123,12 +122,14 @@ public class imgGenRestAPI {
             }
         };
 
+        String pageDescription = payload.get("pageDescription").get(0);
+
         if (imageIDs.size() != 4) {
             throw new IllegalArgumentException(String.format("4 IDs must be provided to the request. Only %d were provided", imageIDs.size()));
         }
 
 
-        String zipID = PageExportBuilder.generateZipFile(imageIDs);
+        String zipID = PageExportBuilder.generateZipFile(imageIDs,pageDescription);
 
         return zipID;
     }

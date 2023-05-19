@@ -8,13 +8,39 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Scanner;
 
+/**
+ * A class that allows you to issue network requests, make API calls, etc. You can create a {@link #HTTPCaller} object to make repetitive API calls by setting the API URL, the API Key, and other fields like content-type, etc. You can keep calling this object with different content by passing the body of the request to the {@link #newRequest} method.
+ *
+ * @author Vishal N (vishalnandagopal.com)
+ */
+
 public class HTTPCaller {
 
+    /**
+     * The URL to call every time when making a API call.
+     */
     URL URLToCall;
+    /**
+     * The method to use - GET or POST. Default is GET
+     */
     String requestMethod;
+    /**
+     * The API key to use with "Authorisation" request property, if any.
+     */
     String APIKey;
+    /**
+     * The content-type of the API call. Set to "application/json" by defauly.
+     */
     String contentType;
 
+    /**
+     * The constructor for the {@link HTTPCaller} class.
+     * @param URLString
+     * @param requestMethod
+     * @param APIKey
+     * @param contentType
+     * @throws MalformedURLException
+     */
     public HTTPCaller(String URLString, String requestMethod, String APIKey, String contentType) throws MalformedURLException {
 
         this.URLToCall = new URL(URLString);
@@ -26,16 +52,19 @@ public class HTTPCaller {
     public static InputStream fetch(URL URLToCall, String requestMethod, String requestBody, String APIKey, String contentType) throws IOException {
         HttpURLConnection httpConn = (HttpURLConnection) URLToCall.openConnection();
 
-        // httpConn.setRequestMethod("POST");
         if (requestMethod.length() > 0) {
+            // httpConn.setRequestMethod("POST");
             httpConn.setRequestMethod(requestMethod);
         } else {
+            // Default is GET. Set to it when passed when an empty string.
             httpConn.setRequestMethod("GET");
         }
 
         if (contentType.length() > 0) {
             // httpConn.setRequestProperty("Content-Type", "application/json");
             httpConn.setRequestProperty("Content-Type", contentType);
+        } else {
+            httpConn.setRequestProperty("Content-Type", "application/json");
         }
 
         if (APIKey.length() > 0) {
@@ -54,11 +83,6 @@ public class HTTPCaller {
 
         int responseCode = httpConn.getResponseCode();
         return responseCode == 200 ? httpConn.getInputStream() : httpConn.getErrorStream();
-    }
-
-    public static InputStream fetch(String URLString, String requestMethod, String requestBody, String APIKey, String contentType) throws IOException {
-        URL URLToCall = new URL(URLString);
-        return fetch(URLToCall, requestMethod, requestBody, APIKey, contentType);
     }
 
     public InputStream fetch(String requestBody) throws IOException {

@@ -27,11 +27,11 @@ public class PageExportBuilder {
      *
      * @param imageIDs - The Arraylist of imageIDs as strings. Must contain 4.
      * @param exportID - The DWP page export ID
-     * @return
+     * @return A string that can be written to a {@code data.json} file as it is
      */
-    public static String getPageExportDataJson(ArrayList<String> imageIDs, String exportID) {
+    public static String getPageExportDataJson(ArrayList<String> imageIDs, String exportID, String pageDescription  ) {
 
-        String filecontentString = "[ {" +
+        return "[ {" +
                 "  \"operation\" : \"CREATE\",\n" +
                 "  \"data\" : {\n" +
                 "    \"name\" : \"Attachment\",\n" +
@@ -331,14 +331,13 @@ public class PageExportBuilder {
                 "    \"attachments\" : [ ]\n" +
                 "  } ]\n" +
                 "} ]";
-        return filecontentString;
     }
 
     /**
      * Returns a string that can be written to an {@code export.manifest} file in the export zip, when given the page export ID.
      *
-     * @param exportID
-     * @return
+     * @param exportID The export ID
+     * @return A string that can be written to a {@code export.manifest} file as it is.
      */
     public static String getPageExportManifestString(String exportID) {
         return String.format("""
@@ -357,7 +356,7 @@ public class PageExportBuilder {
      *
      * @param imageURLs - An ArrayList of URLs as strings.
      * @return A ArrayList of {@link Image} objects.
-     * @throws IOException
+     * @throws IOException If an I/O issue occurs when downloading the image, which is done automatically when creating an {@code Image} object
      */
     public static ArrayList<Image> DallEImageRequestResponse(ArrayList<String> imageURLs) throws IOException {
 
@@ -377,7 +376,7 @@ public class PageExportBuilder {
      * @return The ZipID
      * @throws IOException
      */
-    public static String generateZipFile(ArrayList<String> imageIDs) throws IOException {
+    public static String generateZipFile(ArrayList<String> imageIDs, String pageDescription) throws IOException {
 
         String zipID = Miscellaneous.generateRandomZipID();
         String exportID = Miscellaneous.generateRandomPageExportID();
@@ -396,7 +395,7 @@ public class PageExportBuilder {
         }
 
         // Generate data.json
-        String filecontentString = getPageExportDataJson(imageIDs, exportID);
+        String filecontentString = getPageExportDataJson(imageIDs, exportID, pageDescription);
         String dataFilePath = IMG_FOLDER_PATH + "data.json";
         FileWriter fileWriter = new FileWriter(dataFilePath);
         fileWriter.write(filecontentString);
@@ -489,7 +488,7 @@ public class PageExportBuilder {
          *
          * @param imageURL The URL of the image to download.
          * @param uuid     The ID to use for the image.
-         * @throws IOException
+         * @throws IOException If an issue occurs with I/O operations while downloading the image.
          */
         public static void downloadImage(String imageURL, String uuid) throws IOException {
             URL url = new URL(imageURL);
