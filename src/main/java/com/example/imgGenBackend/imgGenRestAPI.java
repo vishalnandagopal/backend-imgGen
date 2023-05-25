@@ -30,10 +30,10 @@ import java.util.Objects;
 @RestController
 public class imgGenRestAPI {
 
-    static OpenAIClient openAIClient;
+    static AIClients aiClients;
 
     public imgGenRestAPI() throws IOException {
-        openAIClient = new OpenAIClient();
+        aiClients = new AIClients();
     }
 
     public static void main(String[] args) {
@@ -49,7 +49,7 @@ public class imgGenRestAPI {
     public String image_prompt(@RequestBody Map<String, String> payload) throws IOException {
 
         String prompt = payload.get("prompt");
-        String chatResponse = openAIClient.generateImagePrompt(prompt);
+        String chatResponse = aiClients.generateImagePrompt(prompt);
         System.out.printf("%s - %s\n", prompt, chatResponse);
 
         return chatResponse;
@@ -60,7 +60,7 @@ public class imgGenRestAPI {
 
         String prompt = payload.get("prompt");
 
-        String chatResponse = openAIClient.generateContent(prompt);
+        String chatResponse = aiClients.generateContent(prompt);
         System.out.printf("%s - %s\n", prompt, chatResponse);
 
         return chatResponse;
@@ -107,7 +107,7 @@ public class imgGenRestAPI {
             System.out.println("Using mock API");
             return mockImageAPIResponse();
         }
-        return openAIClient.genImage(preparedPrompt, noOfImages, imgSize);
+        return aiClients.genImage(preparedPrompt, noOfImages, imgSize);
     }
 
 
@@ -168,6 +168,6 @@ public class imgGenRestAPI {
                 add("https://imgd.aeplcdn.com/1056x594/n/cw/ec/44686/activa-6g-right-front-three-quarter.jpeg?q=75");
             }
         };
-        return PageExportBuilder.DallEImageRequestResponse(imageURLs);
+        return PageExportBuilder.imageRequestResponse(imageURLs);
     }
 }

@@ -2,6 +2,7 @@ package com.example.imgGenBackend;
 
 import io.github.cdimascio.dotenv.Dotenv;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -37,7 +38,7 @@ public class Miscellaneous {
     }
 
     /**
-     * Reads the environmental variable file at the given filename, if it exists and returns the value of the given key; This checks the current directory, the parent directory and also one more level above it.
+     * Reads the environmental variable file at the given filename, if it exists and returns the value of the given key; This checks the current directory, the parent directory and also one more level above it. Uses the {@link Dotenv} library
      *
      * @param filename The name of the .env file. Current one is "bmc.env" but it is not hardcoded.
      * @param key      The key to search in the env file.
@@ -48,15 +49,18 @@ public class Miscellaneous {
         Dotenv dotenv;
         if (checkIfExists("./" + filename, false)) {
             filename = "./" + filename;
-        } else if (checkIfExists("./../" + filename, false)) {
+        }
+        else if (checkIfExists("./../" + filename, false)) {
             filename = "./../" + filename;
-        } else if (checkIfExists("./../../" + filename, false)) {
+        }
+        else if (checkIfExists("./../../" + filename, false)) {
             filename = "./../../" + filename;
         }
 
         if (filename.length() > 0) {
             dotenv = Dotenv.configure().ignoreIfMissing().filename(filename).load();
-        } else {
+        }
+        else {
             dotenv = Dotenv.configure().ignoreIfMissing().load();
         }
         return dotenv.get(key);
@@ -84,7 +88,8 @@ public class Miscellaneous {
         Path path = generatePath(stringPath);
         if (Files.exists(path)) {
             return true;
-        } else if (createIfNotExists) {
+        }
+        else if (createIfNotExists) {
             Files.createDirectories(path.getParent());
             Files.createFile(path);
             return true;
@@ -126,9 +131,31 @@ public class Miscellaneous {
         for (int i = 1; i < PageExportIDLength; i++) {
             if (i < 5 || randomGenerator.nextBoolean()) {
                 builder.append(letters.charAt(randomGenerator.nextInt(letters.length())));
-            } else {
+            }
+            else {
                 builder.append(numbers.charAt(randomGenerator.nextInt(numbers.length())));
             }
+        }
+        return builder.toString();
+    }
+
+    /**
+     * Get file size by searching for a file with the name {@code imageID} in the folder {@link PageExportBuilder#IMG_FOLDER_PATH IMG_FOLDER_PATH}
+     *
+     * @param imageID The ID of the image
+     * @return
+     */
+    public static long getFileSize(String imageID) {
+        return new File(PageExportBuilder.IMG_FOLDER_PATH + imageID).length();
+    }
+
+    public static String generateRandomFileName() {
+        final int randomFileNameSuffixLength = 6;
+        final String charsToUse = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        final StringBuilder builder = new StringBuilder();
+        builder.append(charsToUse.charAt(randomGenerator.nextInt(charsToUse.length())));
+        for (int i = 1; i < randomFileNameSuffixLength; i++) {
+            builder.append(charsToUse.charAt(randomGenerator.nextInt(charsToUse.length())));
         }
         return builder.toString();
     }
