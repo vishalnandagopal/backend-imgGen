@@ -68,7 +68,7 @@ public class imgGenRestAPI {
 
 
     @PostMapping(value = "/image", produces = "application/json")
-    public ArrayList<PageExportBuilder.Image> image(@RequestBody Map<String, String> payload) throws IOException {
+    public ArrayList<Image> image(@RequestBody Map<String, String> payload) throws IOException {
         int noOfImages;
         String prompt, exclude, include, imgSize, backgroundColor;
 
@@ -162,7 +162,7 @@ public class imgGenRestAPI {
                 .body(buffer);
     }
 
-    private ArrayList<PageExportBuilder.Image> mockImageAPIResponse() throws IOException {
+    private ArrayList<Image> mockImageAPIResponse() throws IOException {
         ArrayList<String> imageURLs = new ArrayList<>() {
             {
                 add("https://imgd.aeplcdn.com/1056x594/n/cw/ec/44686/activa-6g-right-front-three-quarter.jpeg?q=75");

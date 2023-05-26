@@ -39,7 +39,7 @@ public class JSONPreparer {
     }
 
     /**
-     * Processes the JSON given by the Stability AI API. Since it returns the images encoded as a base64 string, this functions saves the images and returns their IDs.{@link com.example.imgGenBackend.PageExportBuilder.Image Image} objects
+     * Processes the JSON given by the Stability AI API. Since it returns the images encoded as a base64 string, this functions saves the images and returns their IDs.{@link Image Image} objects
      *
      * @param responseBody The raw response returned by the API call
      * @return An {@link ArrayList} of URLs as strings
@@ -121,11 +121,11 @@ public class JSONPreparer {
                 // Change ID
                 changeableFieldsObject.put("420003510", imageIDs.get(count));
 
-                // Change filesize
+                // Change file size
                 changeableFieldsObject.put("420003507", String.valueOf(Miscellaneous.getFileSize(imageIDs.get(count))));
 
                 // Change file name
-//                String filename = String.format("Dall-E Generated Image - %d - %s.png", count, Miscellaneous.generateRandomFileName());
+                // String filename = String.format("Dall-E Generated Image - %d - %s.png", count, Miscellaneous.generateRandomFileName());
                 String filename = imageIDs.get(count);
                 changeableFieldsObject.put("420003506", filename);
                 changeableFieldsObject.put("420003509", filename);

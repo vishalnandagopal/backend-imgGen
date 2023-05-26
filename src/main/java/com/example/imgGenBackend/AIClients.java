@@ -38,7 +38,7 @@ public class AIClients {
      * @return An ArrayList of {@code Image} objects that each contains the URL of the image, as well as it's UUID.
      * @throws IOException If I/O error occurs
      */
-    public ArrayList<PageExportBuilder.Image> genImage(String prompt, int noOfImages, String imgSize) throws IOException {
+    public ArrayList<Image> genImage(String prompt, int noOfImages, String imgSize) throws IOException {
         String dallEResponse = dallEClient.callDallEAPI(prompt, noOfImages, imgSize);
         String stabilityAIResponse = stabilityAIClient.callStabilityAIAPI(prompt, noOfImages);
         return new ArrayList<>() {{

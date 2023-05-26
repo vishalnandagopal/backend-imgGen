@@ -3,9 +3,7 @@ package com.example.imgGenBackend;
 import java.io.*;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.NoSuchElementException;
-import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -31,7 +29,7 @@ public class PageExportBuilder {
      * Iterates through imageURLs array, creates Image object for each URL provided and returns an array of their Image objects..
      *
      * @param imageURLs - An ArrayList of URLs as strings.
-     * @return A ArrayList of {@link Image} objects.
+     * @return An {@link ArrayList} of {@link Image} objects.
      * @throws IOException If an I/O issue occurs when downloading the image, which is done automatically when creating an {@code Image} object
      */
     public static ArrayList<Image> dallEImageRequestResponse(ArrayList<String> imageURLs) throws IOException {
@@ -45,6 +43,13 @@ public class PageExportBuilder {
         return images;
     }
 
+    /**
+     * Iterates through all the images returned by Stability AI,, creates Image object for each base64 image provided and returns an array of their Image objects..
+     *
+     * @param base64EncodedStrings The base64 encoded strings of the images as an {@link ArrayList}
+     * @return An {@link ArrayList} of {@link Image} objects.
+     * @throws IOException
+     */
     public static ArrayList<Image> stabilityAIImageRequestResponse(ArrayList<String> base64EncodedStrings) throws IOException {
 
         ArrayList<Image> images = new ArrayList<>();
@@ -60,7 +65,7 @@ public class PageExportBuilder {
      * A method that generates a ZIP file and keeps it ready in the {@link #ZIP_FOLDER_PATH} so that it can be called via the {@code /getzip API}.
      *
      * @param imageIDs The IDs of the images to include in the zip export
-     * @return The ZipID
+     * @return ZipID
      * @throws IOException If I/O error occurs
      */
     public static String generateZipFile(ArrayList<String> imageIDs, String pageDescription) throws IOException {
@@ -143,114 +148,5 @@ public class PageExportBuilder {
             throw new FileNotFoundException(String.format("Zip file with ID %s not found", zipID));
         }
         return new File(zipFilePath).getAbsolutePath();
-    }
-
-
-    /**
-     * A class to store images sent by Dall-E. Create an image by passing the URL. It will automatically be downloaded and assigned to an ID.
-     */
-    final static class Image {
-        String id;
-        String src;
-        String generatedFrom;
-
-        /**
-         * Constructor for Image class. Automatically downloads the image using the {@link Image#downloadImage(URL) downloadImage} method. This constructor must be used if you are dealing with Dall-E's response since it returns the URLs of the image unlike Stability AI, which returns base64 encoded strings of the images.
-         *
-         * @param url The url of the image returned by Dall-e, as a URL object
-         * @throws IOException If I/O error occurs
-         */
-        public Image(URL url, String generatedFrom) throws IOException {
-            this.id = UUID.randomUUID().toString();
-            this.generatedFrom = generatedFrom;
-            this.src = url.toString();
-
-            // Downloads the image since it is a URL.
-            this.downloadImage(url);
-        }
-
-        /**
-         * Constructor for Image class. Automatically downloads the image using the {@link #downloadImage(URL urll) downloadImage} () downloadImage} ()} method. This constructor must be used if you are dealing with Stability AI's response since it returns the base64 encoded strings unlike Stability AI, which returns URLs of the images.
-         *
-         * @param base64EncodedImage Base64 encoded strings of the images
-         * @throws IOException If I/O error occurs
-         */
-        public Image(String base64EncodedImage, String generatedFrom) throws IOException {
-            this.id = UUID.randomUUID().toString();
-            this.generatedFrom = generatedFrom;
-            this.src = base64EncodedImage;
-
-            // Save the image instead of downloading it, since the response is the base64 of the image
-            this.saveImage(base64EncodedImage);
-        }
-
-        private static void saveImage(String base64EncodedImage, String uuid) throws IOException {
-            byte[] imageBytes = Base64.getDecoder().decode(base64EncodedImage);
-            File file = new File(IMG_FOLDER_PATH + uuid);
-            try (OutputStream outputStream = new FileOutputStream(file)) {
-                outputStream.write(imageBytes);
-            }
-            System.out.println("Image saved successfully!");
-        }
-
-        /**
-         * A method that automatically downloads the URL and assigns it to the given ID. To download an image without providing the ID, you can offer call the method with just the URL.
-         *
-         * @param imageURL The URL of the image to download.
-         * @param uuid     The ID to use for the image.
-         * @throws IOException If an issue occurs with I/O operations while downloading the image.
-         */
-        private static void downloadImage(URL imageURL, String uuid) throws IOException {
-            File file = new File(IMG_FOLDER_PATH + uuid);
-
-            Miscellaneous.checkIfExists(IMG_FOLDER_PATH, true);
-
-            try (InputStream inputStream = imageURL.openStream(); OutputStream outputStream = new FileOutputStream(file)) {
-                byte[] buffer = new byte[2048];
-                int length;
-
-                while ((length = inputStream.read(buffer)) != -1) {
-                    outputStream.write(buffer, 0, length);
-                }
-            }
-            System.out.println("Downloaded " + imageURL + "-" + uuid);
-        }
-
-        @Override
-        public String toString() {
-            return String.format("%s - %s", this.id, this.generatedFrom);
-        }
-
-        public void downloadImage(URL url) throws IOException {
-            Image.downloadImage(url, this.id);
-        }
-
-        public void saveImage(String base64EncodedImage) throws IOException {
-            Image.saveImage(base64EncodedImage, this.id);
-        }
-
-        public String getId() {
-            return id;
-        }
-
-        public void setId(String id) {
-            this.id = id;
-        }
-
-        public String getSrc() {
-            return src;
-        }
-
-        public void setSrc(String src) {
-            this.src = src;
-        }
-
-        public String getGeneratedFrom() {
-            return generatedFrom;
-        }
-
-        public void setGeneratedFrom(String generatedFrom) {
-            this.generatedFrom = generatedFrom;
-        }
     }
 }
