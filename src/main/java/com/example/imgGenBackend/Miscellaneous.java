@@ -15,7 +15,7 @@ import java.util.logging.Logger;
 
 public class Miscellaneous {
     private final static Random randomGenerator = new Random();
-    private final static String filename = "./imgGen backend.log";
+    private final static String logFileName = "./imgGen backend.log";
 
     static {
         try {

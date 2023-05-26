@@ -42,11 +42,11 @@ public class AIClients {
         String dallEResponse = dallEClient.callDallEAPI(prompt, noOfImages, imgSize);
         String stabilityAIResponse = stabilityAIClient.callStabilityAIAPI(prompt, noOfImages);
         return new ArrayList<>() {{
-            addAll(PageExportBuilder.imageRequestResponse(
+            addAll(PageExportBuilder.dallEImageRequestResponse(
                     JSONPreparer.extractImageURLsFromDallEResponse(dallEResponse)
             ));
-            addAll(PageExportBuilder.imageRequestResponse(
-                    JSONPreparer.extractImageURLsFromStabilityAIResponse(stabilityAIResponse)
+            addAll(PageExportBuilder.stabilityAIImageRequestResponse(
+                    JSONPreparer.extractBase64ImageFromStabilityAIResponse(stabilityAIResponse)
             ));
         }};
     }
@@ -72,7 +72,7 @@ public class AIClients {
      * @throws IOException If I/O error occurs
      */
     public String generateImagePrompt(String userPrompt) throws IOException {
-        String systemPromptForImagePrompt = "You have to act as an assistant that helps users generated prompts for an AI image generation system named Dall-E. It can create realistic images and art from a description in natural language. The user will provide a short and simple description of the image they want to generate. Help them generate a suitable prompt that can be fed to Dall-E 2 to generate clear, appealing images without any distortions or blur. You can expand on the prompt in case it would lead to a more descriptive prompt. Generate an clear, well-detailed and descriptive prompt for any prompt provided by the user. Do not include commands or text that asks it to generate an image, since Dall-E assumes it already. You just have to provide a description of the image that the user can prompt Dall-E with. Do not include any additional text while providing your reply such as anything indicating that you are replying with a prompt. The user should be able to use your prompt as it is without any deletions or additions.";
+        String systemPromptForImagePrompt = "You have to act as an assistant that helps users generated prompts for an AI image generation system named Dall-E. It can create realistic images and art from a description in natural language. The user will provide a short and simple description of the image they want to generate. Help them generate a suitable prompt that can be fed to Dall-E 2 to generate clear, appealing images without any distortions or blur. You can expand on the prompt in case it would lead to a more descriptive prompt. Generate an clear, well-detailed and descriptive prompt for any prompt provided by the user. Make sure the prompt you generate is in first person speech. Do not include commands or text that asks it to generate an image, since Dall-E assumes it already. You just have to provide a description of the image that the user can prompt Dall-E with. Do not include any additional text while providing your reply such as anything indicating that you are replying with a prompt. The user should be able to use your prompt as it is without any deletions or additions. Do not frame the prompt as a question, such as asking whether such a prompt would be good or bad.";
         return genChat(systemPromptForImagePrompt, userPrompt);
     }
 
@@ -112,7 +112,7 @@ class DallEClient {
      * @throws MalformedURLException If there is an issue with creating the URL object due to URL being malformed.
      */
     public DallEClient(String apiKey) throws MalformedURLException {
-        this.httpCaller = new HTTPCaller(IMAGE_GEN_API_URL, "POST", apiKey, "application/json");
+        this.httpCaller = new HTTPCaller(IMAGE_GEN_API_URL, "POST", apiKey, "application/json", "");
     }
 
     /**
@@ -159,9 +159,9 @@ class DallEClient {
         String requestBody = String.format("{ \"prompt\": \"%s\", \"n\": %d, \"size\": \"%s\" }", prompt,
                 noOfImages,
                 imgSize);
+        ;
         String responseBody = httpCaller.newRequest(requestBody);
         System.out.println("Response from Dall-E is: \n" + responseBody);
-        System.out.println(responseBody);
         return responseBody;
     }
 }
@@ -173,7 +173,7 @@ class StabilityAIClient {
     /**
      * The URL of the API to be used for communicating with Stability-AI.
      */
-    final static String STABILITY_AI_API_URL = "https://api.stability.ai/v1/generation/stable-diffusion-v1-5/text-to-image";
+    final static String STABILITY_AI_API_URL = "https://api.stability.ai/v1/generation/stable-diffusion-xl-beta-v2-2-2/text-to-image";
     HTTPCaller httpCaller;
 
     /**
@@ -183,7 +183,7 @@ class StabilityAIClient {
      * @throws MalformedURLException If there is an issue with creating the URL object due to URL being malformed.
      */
     StabilityAIClient(String apiKey) throws MalformedURLException {
-        this.httpCaller = new HTTPCaller(STABILITY_AI_API_URL, "POST", apiKey, "application/json");
+        this.httpCaller = new HTTPCaller(STABILITY_AI_API_URL, "POST", apiKey, "application/json", "application/json");
     }
 
     /**
@@ -196,12 +196,10 @@ class StabilityAIClient {
      */
     public String callStabilityAIAPI(String prompt, int noOfImages)
             throws IOException {
-        System.out.println(prompt);
         String requestBody = String.format("{ \"text_prompts\": [{\"text\":\"%s\"}], \"cfg_scale\":20, \"samples\": %d}", prompt,
                 noOfImages);
         String responseBody = httpCaller.newRequest(requestBody);
-        System.out.println("Response from Dall-E is: \n" + responseBody);
-        System.out.println(responseBody);
+        System.out.println("Response from Stability AI is: \n" + responseBody.substring(0, 30));
         return responseBody;
     }
 }
@@ -230,7 +228,7 @@ class ChatGPTClient {
      * @throws MalformedURLException If there is an issue with creating the URL object due to URL being malformed.
      */
     ChatGPTClient(String apiKey) throws MalformedURLException {
-        this.httpCaller = new HTTPCaller(CHAT_GPT_API_URL, "POST", apiKey, "application/json");
+        this.httpCaller = new HTTPCaller(CHAT_GPT_API_URL, "POST", apiKey, "application/json", "");
     }
 
     /**

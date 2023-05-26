@@ -39,27 +39,27 @@ public class JSONPreparer {
     }
 
     /**
-     * Processes the JSON given by the Stability AI API and returns the URLs of the images it created as a response to your API call.
+     * Processes the JSON given by the Stability AI API. Since it returns the images encoded as a base64 string, this functions saves the images and returns their IDs.{@link com.example.imgGenBackend.PageExportBuilder.Image Image} objects
      *
      * @param responseBody The raw response returned by the API call
      * @return An {@link ArrayList} of URLs as strings
      * @throws JsonProcessingException
      */
-    public static ArrayList<String> extractImageURLsFromStabilityAIResponse(String responseBody) throws JsonProcessingException {
+    public static ArrayList<String> extractBase64ImageFromStabilityAIResponse(String responseBody) throws JsonProcessingException {
 
         JsonNode rootNode = JSONPreparer.getJsonObjectMap(responseBody);
 
         // We are handling a response from Stability AI. We need to extract the image SRCs from the response
-        ArrayList<String> imgSRCs = new ArrayList<>();
+        ArrayList<String> base64EncodedStrings = new ArrayList<>();
 
-        int noOfImages = rootNode.get("data").size();
+        int noOfImages = rootNode.size();
 
         for (int i = 0; i < noOfImages; i++) {
-            imgSRCs.add(rootNode.get("data").get(i).get("url").asText());
+            base64EncodedStrings.add(rootNode.get("artifacts").get(i).get("base64").asText());
         }
 
-        // Return the URLs
-        return imgSRCs;
+        // Return the base64 encoded versions of the images
+        return base64EncodedStrings;
     }
 
     /**
@@ -77,12 +77,13 @@ public class JSONPreparer {
         // We are handling a response from Dall-E. We need to extract the image SRCs from the response
         ArrayList<String> imgSRCs = new ArrayList<>();
 
-        int noOfImages = rootNode.get("data").size();
+        if (rootNode.get("data") != null) {
+            int noOfImages = rootNode.get("data").size();
 
-        for (int i = 0; i < noOfImages; i++) {
-            imgSRCs.add(rootNode.get("data").get(i).get("url").asText());
+            for (int i = 0; i < noOfImages; i++) {
+                imgSRCs.add(rootNode.get("data").get(i).get("url").asText());
+            }
         }
-
         // Return the URLs
         return imgSRCs;
     }
@@ -124,12 +125,13 @@ public class JSONPreparer {
                 changeableFieldsObject.put("420003507", String.valueOf(Miscellaneous.getFileSize(imageIDs.get(count))));
 
                 // Change file name
-                String filename = String.format("Dall-E Generated Image - %d - %s.png", count, Miscellaneous.generateRandomFileName());
+//                String filename = String.format("Dall-E Generated Image - %d - %s.png", count, Miscellaneous.generateRandomFileName());
+                String filename = imageIDs.get(count);
                 changeableFieldsObject.put("420003506", filename);
                 changeableFieldsObject.put("420003509", filename);
 
                 changeableAttachmentObject = ((ObjectNode) (jsonChildObject.get("data").get("attachments").get(0)));
-                changeableAttachmentObject.put("filename", filename);
+                changeableAttachmentObject.put("fileName", filename);
                 changeableAttachmentObject.put("contentRef", imageIDs.get(count));
                 count++;
             }
@@ -141,7 +143,7 @@ public class JSONPreparer {
 
                 changeableFieldsObject.put("420003505", pageName);
                 changeableFieldsObject = ((ObjectNode) (pageObject.get("data").get("localizedFields").get("420003505")));
-                changeableFieldsObject.put("en_US", pageName);
+                changeableFieldsObject.put("en-US", pageName);
                 changeableFieldsObject.put("_", pageName);
             }
         }

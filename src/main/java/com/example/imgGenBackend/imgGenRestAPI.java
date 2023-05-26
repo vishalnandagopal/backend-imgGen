@@ -166,8 +166,9 @@ public class imgGenRestAPI {
         ArrayList<String> imageURLs = new ArrayList<>() {
             {
                 add("https://imgd.aeplcdn.com/1056x594/n/cw/ec/44686/activa-6g-right-front-three-quarter.jpeg?q=75");
+                add("https://cdn-icons-png.flaticon.com/512/126/126472.png");
             }
         };
-        return PageExportBuilder.imageRequestResponse(imageURLs);
+        return PageExportBuilder.dallEImageRequestResponse(imageURLs);
     }
 }
