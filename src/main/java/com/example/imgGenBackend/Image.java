@@ -71,19 +71,24 @@ final class Image {
      * @throws IOException If an issue occurs with I/O operations while downloading the image.
      */
     private static void downloadImage(URL imageURL, String uuid) throws IOException {
-        File file = new File(PageExportBuilder.IMG_FOLDER_PATH + uuid);
+        Thread theadForDownloadingImage = new Thread(() -> {
+            File file = new File(PageExportBuilder.IMG_FOLDER_PATH + uuid);
+            try {
+                Miscellaneous.checkIfExists(PageExportBuilder.IMG_FOLDER_PATH, true);
+                try (InputStream inputStream = imageURL.openStream(); OutputStream outputStream = new FileOutputStream(file)) {
+                    byte[] buffer = new byte[2048];
+                    int length;
 
-        Miscellaneous.checkIfExists(PageExportBuilder.IMG_FOLDER_PATH, true);
-
-        try (InputStream inputStream = imageURL.openStream(); OutputStream outputStream = new FileOutputStream(file)) {
-            byte[] buffer = new byte[2048];
-            int length;
-
-            while ((length = inputStream.read(buffer)) != -1) {
-                outputStream.write(buffer, 0, length);
+                    while ((length = inputStream.read(buffer)) != -1) {
+                        outputStream.write(buffer, 0, length);
+                    }
+                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
-        }
-        System.out.println("Downloaded " + imageURL + "-" + uuid);
+            System.out.println("Downloaded " + imageURL + " - " + uuid);
+        });
+        theadForDownloadingImage.start();
     }
 
 

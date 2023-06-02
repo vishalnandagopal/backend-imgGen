@@ -11,10 +11,7 @@ import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 
 /**
@@ -112,7 +109,7 @@ public class imgGenRestAPI {
 
 
     @PostMapping(value = "/getzipID", produces = "application/json")
-    public String getzipID(@RequestBody Map<String, List<String>> payload) throws IOException {
+    public HashMap<String, Object> getzipID(@RequestBody Map<String, List<String>> payload) throws IOException {
         ArrayList<String> imageIDs = new ArrayList<>() {
             {
                 addAll(payload.get("imageIDs"));
@@ -122,10 +119,17 @@ public class imgGenRestAPI {
         String pageDescription = payload.get("pageDescription").get(0);
 
         if (imageIDs.size() != 4) {
-            throw new IllegalArgumentException(String.format("4 IDs must be provided to the request. Only %d were provided", imageIDs.size()));
+            return new HashMap<String, Object>() {{
+                put("zipGenerated", false);
+                put("zipID", 0);
+                put("error",String.format("4 IDs must be provided to the request. Only %d were provided", imageIDs.size()));
+            }};
         }
+        return new HashMap<String, Object>() {{
+            put("zipGenerated", true);
+            put("zipID", PageExportBuilder.generateZipFile(imageIDs, pageDescription));
+        }};
 
-        return PageExportBuilder.generateZipFile(imageIDs, pageDescription);
     }
 
 

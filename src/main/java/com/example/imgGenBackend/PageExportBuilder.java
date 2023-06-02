@@ -7,6 +7,14 @@ import java.util.NoSuchElementException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+/**
+ * Helps you prepare a page export. Handles exporting {@code data.json},{@code export.manifest} and generating the zip file for Innovation Studio
+ *
+ * @author Vishal N (vishalnandagopal.com)
+ * @version 1.0
+ * @since 2023-01-09
+ */
+
 public class PageExportBuilder {
 
     /**
@@ -132,6 +140,7 @@ public class PageExportBuilder {
         }
         System.out.println(zipID);
         zos.close();
+        System.out.println(zipID + " - generated zip with this id");
         return zipID;
     }
 

@@ -152,6 +152,8 @@ public class JSONPreparer {
         for (int i = 0; i < count; i++) {
             jsonString = jsonString.replace(oldImageIDs.get(i), imageIDs.get(i));
         }
+        // Adding page description
+        jsonString = jsonString.replace("Sample text for a text block", pageDescription);
         return jsonString;
     }
 

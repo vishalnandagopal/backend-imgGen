@@ -13,7 +13,18 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
+/**
+ * A class to hold miscellaneous functions like reading env files.
+ *
+ * @author Vishal N (vishalnandagopal.com)
+ * @version 1.0
+ * @since 2023-01-09
+ */
+
 public class Miscellaneous {
+    /**
+     * Common random generator for all random functions.
+     */
     private final static Random randomGenerator = new Random();
     private final static String logFileName = "./imgGen backend.log";
 
@@ -149,6 +160,10 @@ public class Miscellaneous {
         return new File(PageExportBuilder.IMG_FOLDER_PATH + imageID).length();
     }
 
+    /**
+     * Generate a random alphanumeric string, can be used anywhere.
+     * @return Alphanumeric string
+     */
     public static String generateRandomFileName() {
         final int randomFileNameSuffixLength = 6;
         final String charsToUse = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
