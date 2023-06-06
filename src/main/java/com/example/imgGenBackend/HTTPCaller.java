@@ -62,8 +62,7 @@ public class HTTPCaller {
         if (requestMethod.length() > 0) {
             // httpConn.setRequestMethod("POST");
             httpConn.setRequestMethod(requestMethod);
-        }
-        else {
+        } else {
             // Default is GET. Set to it when passed when an empty string.
             httpConn.setRequestMethod("GET");
         }
@@ -71,8 +70,7 @@ public class HTTPCaller {
         if (contentType.length() > 0) {
             // httpConn.setRequestProperty("Content-Type", "application/json");
             httpConn.setRequestProperty("Content-Type", contentType);
-        }
-        else {
+        } else {
             httpConn.setRequestProperty("Content-Type", "application/json");
         }
 
@@ -84,8 +82,7 @@ public class HTTPCaller {
         if (acceptsHeader.length() > 0) {
             // httpConn.setRequestProperty("Accept", "");
             httpConn.setRequestProperty("Accept", acceptsHeader);
-        }
-        else {
+        } else {
             httpConn.setRequestProperty("Accept", "application/json");
         }
 

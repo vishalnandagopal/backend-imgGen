@@ -173,6 +173,6 @@ public class imgGenRestAPI {
                 add("https://cdn-icons-png.flaticon.com/512/126/126472.png");
             }
         };
-        return aiClients.createImageObjects(imageURLs,"d");
+        return aiClients.createImageObjects(imageURLs, "d");
     }
 }

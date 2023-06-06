@@ -1,7 +1,6 @@
 package com.example.imgGenBackend;
 
 import java.io.*;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
 import java.util.zip.ZipEntry;
@@ -31,7 +30,6 @@ public class PageExportBuilder {
      * The path where the zip files will be stored. They will be stored in the system's temp directory since it is not necessary for them to be available permanently..
      */
     static final String ZIP_FOLDER_PATH = new File(sysTmpDirectory + "/imgGen/ZIP Files/").getAbsolutePath() + "/";
-
 
 
     /**

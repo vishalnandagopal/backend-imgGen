@@ -60,18 +60,15 @@ public class Miscellaneous {
         Dotenv dotenv;
         if (checkIfExists("./" + filename, false)) {
             filename = "./" + filename;
-        }
-        else if (checkIfExists("./../" + filename, false)) {
+        } else if (checkIfExists("./../" + filename, false)) {
             filename = "./../" + filename;
-        }
-        else if (checkIfExists("./../../" + filename, false)) {
+        } else if (checkIfExists("./../../" + filename, false)) {
             filename = "./../../" + filename;
         }
 
         if (filename.length() > 0) {
             dotenv = Dotenv.configure().ignoreIfMissing().filename(filename).load();
-        }
-        else {
+        } else {
             dotenv = Dotenv.configure().ignoreIfMissing().load();
         }
         return dotenv.get(key);
@@ -99,8 +96,7 @@ public class Miscellaneous {
         Path path = generatePath(stringPath);
         if (Files.exists(path)) {
             return true;
-        }
-        else if (createIfNotExists) {
+        } else if (createIfNotExists) {
             Files.createDirectories(path.getParent());
             Files.createFile(path);
             return true;
@@ -142,8 +138,7 @@ public class Miscellaneous {
         for (int i = 1; i < PageExportIDLength; i++) {
             if (i < 5 || randomGenerator.nextBoolean()) {
                 builder.append(letters.charAt(randomGenerator.nextInt(letters.length())));
-            }
-            else {
+            } else {
                 builder.append(numbers.charAt(randomGenerator.nextInt(numbers.length())));
             }
         }
@@ -162,6 +157,7 @@ public class Miscellaneous {
 
     /**
      * Generate a random alphanumeric string, can be used anywhere.
+     *
      * @return Alphanumeric string
      */
     public static String generateRandomFileName() {

@@ -32,8 +32,9 @@ public class AIClients {
 
     /**
      * Iterates through the responses of either Dall-E or Stability AI, and based on the source, returns an {@link ArrayList ArrayList} of {@link Image} objects.
+     *
      * @param extractedResponse The response from either Dall-E or Stability AI
-     * @param source "d" for Dall-E. "s" for Stability AI
+     * @param source            "d" for Dall-E. "s" for Stability AI
      * @return An {@link ArrayList} of {@link Image} objects.
      * @throws IOException
      */

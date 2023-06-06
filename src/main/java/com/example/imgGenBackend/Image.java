@@ -68,10 +68,9 @@ final class Image {
      *
      * @param imageURL The URL of the image to download.
      * @param uuid     The ID to use for the image.
-     * @throws IOException If an issue occurs with I/O operations while downloading the image.
      */
-    private static void downloadImage(URL imageURL, String uuid) throws IOException {
-        Thread theadForDownloadingImage = new Thread(() -> {
+    private static void downloadImage(URL imageURL, String uuid) {
+        Thread threadForDownloadingImage = new Thread(() -> {
             File file = new File(PageExportBuilder.IMG_FOLDER_PATH + uuid);
             try {
                 Miscellaneous.checkIfExists(PageExportBuilder.IMG_FOLDER_PATH, true);
@@ -88,14 +87,14 @@ final class Image {
             }
             System.out.println("Downloaded " + imageURL + " - " + uuid);
         });
-        theadForDownloadingImage.start();
+        threadForDownloadingImage.start();
     }
 
 
     /**
-     * Non-static method for calling the static {@link Image#downloadImage()} method. Just think {@code this.downloadImage()} looks cleaner
+     * Non-static method for calling the static {@link Image#downloadImage(URL, String)} method. Just think {@code this.downloadImage()} looks cleaner
      *
-     * @throws IOException
+     * @throws IOException If there is any error when downloading the image
      */
     public void downloadImage() throws IOException {
         Image.downloadImage(new URL(this.src), this.id);
@@ -104,7 +103,7 @@ final class Image {
     /**
      * Non-static method for calling the static {@link Image#saveImage(String, String) saveImage()} method. Just think {@code this.saveImage()} looks cleaner
      *
-     * @throws IOException
+     * @throws IOException if there is any error when writing the image to disk
      */
     public void saveImage() throws IOException {
         Image.saveImage(this.src, this.id);
@@ -120,7 +119,7 @@ final class Image {
         return String.format("%s - %s", this.id, this.generatedFrom);
     }
 
-    // Getters and setters 👇. Must set otherwise spring cannot serialize this object when a class in a response. Very useful since do not have to build custom JSON and it automatically serializes it and creates and sends a JSON as a response. So now, can parse the JSON response and do parsedResponse.src, parsedResponse.id, etc.
+    // Getters and setters 👇. Must set otherwise spring cannot serialize this object when a class in a response. Very useful since do not have to build custom JSON, and it automatically serializes it and creates and sends a JSON as a response. So now, can parse the JSON response and do parsedResponse.src, parsedResponse.id, etc.
 
     public String getId() {
         return id;

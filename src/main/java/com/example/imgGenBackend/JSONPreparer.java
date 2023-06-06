@@ -134,8 +134,7 @@ public class JSONPreparer {
                 changeableAttachmentObject.put("fileName", filename);
                 changeableAttachmentObject.put("contentRef", imageIDs.get(count));
                 count++;
-            }
-            else if (i.get("data").get("name").asText().equals("Page")) {
+            } else if (i.get("data").get("name").asText().equals("Page")) {
                 // It is a page.
                 ObjectNode pageObject = (ObjectNode) i;
                 changeableFieldsObject = ((ObjectNode) (pageObject.get("data").get("fields")));
