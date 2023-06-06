@@ -119,13 +119,13 @@ public class imgGenRestAPI {
         String pageDescription = payload.get("pageDescription").get(0);
 
         if (imageIDs.size() != 4) {
-            return new HashMap<String, Object>() {{
+            return new HashMap<>() {{
                 put("zipGenerated", false);
                 put("zipID", 0);
-                put("error",String.format("4 IDs must be provided to the request. Only %d were provided", imageIDs.size()));
+                put("error", String.format("4 IDs must be provided to the request. Only %d were provided", imageIDs.size()));
             }};
         }
-        return new HashMap<String, Object>() {{
+        return new HashMap<>() {{
             put("zipGenerated", true);
             put("zipID", PageExportBuilder.generateZipFile(imageIDs, pageDescription));
         }};
@@ -133,7 +133,7 @@ public class imgGenRestAPI {
     }
 
 
-    // Previous route was to /getzip/{zipID}. But it always saved the file as zipID instead of zipID.zip even if explicitly mentioning in the response headers. So the route was changed to /getzip/{zipID}.zip.
+    // Previous route was to /getzip/{zipID}. But it always saved the file as just "zipID" instead of "zipID.zip" even if explicitly mentioning in the response headers. So the route was changed to /getzip/{zipID}.zip.
     @GetMapping(value = "/getzip/{zipID}.zip")
     public ResponseEntity<byte[]> getzip(@PathVariable String zipID, HttpServletResponse
             response) throws IOException {
@@ -173,6 +173,6 @@ public class imgGenRestAPI {
                 add("https://cdn-icons-png.flaticon.com/512/126/126472.png");
             }
         };
-        return PageExportBuilder.dallEImageRequestResponse(imageURLs);
+        return aiClients.createImageObjects(imageURLs,"d");
     }
 }

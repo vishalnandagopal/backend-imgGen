@@ -2,6 +2,7 @@ package com.example.imgGenBackend;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 
 /**
@@ -30,6 +31,29 @@ public class AIClients {
     }
 
     /**
+     * Iterates through the responses of either Dall-E or Stability AI, and based on the source, returns an {@link ArrayList ArrayList} of {@link Image} objects.
+     * @param extractedResponse The response from either Dall-E or Stability AI
+     * @param source "d" for Dall-E. "s" for Stability AI
+     * @return An {@link ArrayList} of {@link Image} objects.
+     * @throws IOException
+     */
+    public ArrayList<Image> createImageObjects(ArrayList<String> extractedResponse, String source) throws IOException {
+        ArrayList<Image> images = new ArrayList<>();
+
+        if (source.equals("d")) {
+            for (String imageURL : extractedResponse) {
+
+                images.add(new Image(new URL(imageURL), "d"));
+            }
+        } else if (source.equals("s")) {
+            for (String base64EncodedString : extractedResponse) {
+                images.add(new Image(base64EncodedString, "s"));
+            }
+        }
+        return images;
+    }
+
+    /**
      * Generate one or more images with the given prompt by using the Dall-E API..
      *
      * @param prompt     The prompt to be supplied to Dall-E
@@ -42,12 +66,8 @@ public class AIClients {
         String dallEResponse = dallEClient.callDallEAPI(prompt, noOfImages, imgSize);
         String stabilityAIResponse = stabilityAIClient.callStabilityAIAPI(prompt, noOfImages);
         return new ArrayList<>() {{
-            addAll(PageExportBuilder.dallEImageRequestResponse(
-                    JSONPreparer.extractImageURLsFromDallEResponse(dallEResponse)
-            ));
-            addAll(PageExportBuilder.stabilityAIImageRequestResponse(
-                    JSONPreparer.extractBase64ImageFromStabilityAIResponse(stabilityAIResponse)
-            ));
+            addAll(createImageObjects(JSONPreparer.extractImageURLsFromDallEResponse(dallEResponse), "d"));
+            addAll(createImageObjects(JSONPreparer.extractBase64ImageFromStabilityAIResponse(stabilityAIResponse), "s"));
         }};
     }
 
@@ -159,7 +179,6 @@ class DallEClient {
         String requestBody = String.format("{ \"prompt\": \"%s\", \"n\": %d, \"size\": \"%s\" }", prompt,
                 noOfImages,
                 imgSize);
-        ;
         String responseBody = httpCaller.newRequest(requestBody);
         System.out.println("Response from Dall-E is: \n" + responseBody);
         return responseBody;
@@ -202,6 +221,7 @@ class StabilityAIClient {
         System.out.println("Response from Stability AI is: \n" + responseBody.substring(0, 30));
         return responseBody;
     }
+
 }
 
 /**
@@ -260,8 +280,7 @@ class ChatGPTClient {
             }
             if (messages.length() > 0) {
                 messages = String.format("%s,{\"role\": \"%s\",\"content\": \"%s\"}", messages, roles[i], messageContents[i]);
-            }
-            else {
+            } else {
                 messages = String.format("{\"role\": \"%s\",\"content\": \"%s\"}", roles[i], messageContents[i]);
             }
         }

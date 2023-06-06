@@ -33,41 +33,6 @@ public class PageExportBuilder {
     static final String ZIP_FOLDER_PATH = new File(sysTmpDirectory + "/imgGen/ZIP Files/").getAbsolutePath() + "/";
 
 
-    /**
-     * Iterates through imageURLs array, creates Image object for each URL provided and returns an array of their Image objects..
-     *
-     * @param imageURLs - An ArrayList of URLs as strings.
-     * @return An {@link ArrayList} of {@link Image} objects.
-     * @throws IOException If an I/O issue occurs when downloading the image, which is done automatically when creating an {@code Image} object
-     */
-    public static ArrayList<Image> dallEImageRequestResponse(ArrayList<String> imageURLs) throws IOException {
-
-        ArrayList<Image> images = new ArrayList<>();
-
-        for (String imageURL : imageURLs) {
-            images.add(new Image(new URL(imageURL), "d"));
-        }
-
-        return images;
-    }
-
-    /**
-     * Iterates through all the images returned by Stability AI,, creates Image object for each base64 image provided and returns an array of their Image objects..
-     *
-     * @param base64EncodedStrings The base64 encoded strings of the images as an {@link ArrayList}
-     * @return An {@link ArrayList} of {@link Image} objects.
-     * @throws IOException
-     */
-    public static ArrayList<Image> stabilityAIImageRequestResponse(ArrayList<String> base64EncodedStrings) throws IOException {
-
-        ArrayList<Image> images = new ArrayList<>();
-
-        for (String base64EncodedString : base64EncodedStrings) {
-            images.add(new Image(base64EncodedString, "s"));
-        }
-
-        return images;
-    }
 
     /**
      * A method that generates a ZIP file and keeps it ready in the {@link #ZIP_FOLDER_PATH} so that it can be called via the {@code /getzip API}.
