@@ -2,8 +2,8 @@
 
 ## Intro
 
-A Spring application that serves as the backend for the angular frontend. This serves as an customized intermediate
-between the angular frontend and OpenAI servers.
+A Spring application that serves as the backend for the angular frontend. This serves as a customized intermediate
+between the angular frontend and OpenAI/Stability AI servers.
 
 ## Install the following
 
@@ -11,12 +11,13 @@ between the angular frontend and OpenAI servers.
 
 ## Environmental keys (Important)
 
--   Put your OpenAI key in a file named `bmc.env` in the same folder as this README. The structure of the `bmc.env` file
-    is :-
-    ```
-    OPENAI_API_KEY=xxxxx
-    ```
--   The backend will not be able to communicate with the OpenAI servers without the API key.
+- Put your OpenAI key in a file named `bmc.env` in the same folder as this README. The structure of the `bmc.env` file
+  is :-
+  ```
+  OPENAI_API_KEY=xxxxx
+  STABILITY_AI_API_KEY=xxxxxx
+  ```
+- The backend will not be able to communicate with the OpenAI servers without the API key.
 
 ## Running the file
 
@@ -29,7 +30,7 @@ It has a `main` function which you can run.
 
 1. In the backend-ImgGen folder, run `mvnw spring-boot:run`
 
-The imgGenRestAPI.java file has the `main` function.
+The imgGenRestAPI.java file has the `main` function which will run the app.
 
 ## Files and their functions
 
